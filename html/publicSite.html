@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="demo" ng-controller="Ctrl">
+<head>
+<meta charset="UTF-8">
+<title>{{ page_name }} - {{ Site }}</title>
+<link rel="stylesheet" href="../../files/fonts.css" type="text/css" />
+<link href="http://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
+<style type="text/css">
+body { font-family: 'Raleway', sans-serif; color: #839496; }
+
+.user_gate { font-size: 12px; text-align: right; position: fixed; top: 10px; right: 10px;  }
+.user_gate a { color: blue; text-decoration: none; }
+.user_gate a:visited { color: blue; }
+.user_gate a:hover { text-decoration: underline; }
+
+.left_aside { position: fixed; top: 120px; left: 0; bottom: 65px; width: 175px; border-right: 1px solid #ddd; }
+
+.logo_wrap { font-size: 14px; position: fixed; top: 10px; left: 15px; width: 140px; text-align: center; line-height: 18px; letter-spacing: .09em; color: #aaa; }
+.logo_wrap a { color: #839496; text-decoration: none; }
+.logo_wrap a:visited { color: #839496; }
+
+.main_nav { position: fixed; left: 35px; top: 135px; text-align: right; width: 125px; }
+.main_nav ul { padding: 0; margin: 0; }
+.main_nav li { list-style: none; padding-right: 12px; border-right: 3px solid #fff; margin-bottom: 25px; }
+.main_nav li:hover { border-right: 3px solid #444; color: #002b36; }
+.main_nav li#{{ page_id }}Nav{ border-right: 3px solid #444; color: #002b36; }
+.main_nav a { text-decoration: none; color: #839496; }
+
+.nav_graphic { cursor: pointer; position: fixed; bottom: 10px; left: 25px; font-family: 'EntypoRegular'; font-size: 46px; }
+
+.color_a { color: #2aa198; }
+.color_b { color: #657b83; }
+
+.main_wrap { width: 600px; margin: 0 auto; padding-top: 105px; }
+
+.page_wrap {  padding-bottom: 125px; margin-top: 25px; border-right: 1px solid #eee; }
+.page_wrap a { color: #268bd2; text-decoration: none; }
+
+.main_wrap img { width: 95%; }
+
+
+@media only screen and (max-width: 1000px) { /* - Narrow Layout - */
+  .main_wrap { padding-left: 215px; }
+
+} /* - End Narrow - */
+
+header.hi { margin: 25px; font-size: 32px; width: 385px; padding: 10px; border-bottom: 1px solid blue; color: #aaa; letter-spacing: .08em; padding-left: 25px; }
+
+</style>
+
+{{ analytics|safe }}
+<script type="text/javascript" src="../../files/angular.min.js"></script>
+<script>
+var demo = angular.module("demo", [],
+  function($interpolateProvider) {
+    $interpolateProvider.startSymbol('[!');
+    $interpolateProvider.endSymbol('!]');
+}) ///
+
+demo.controller('Ctrl', function($scope, $http) {
+  $scope.huDisplay = 'on';
+
+{% if page_id == 'entries' %}
+  $scope.items = [];
+  $http({ method: 'GET', url: '../../list/entries' })
+  .success(function(data, status) { $scope.items = data; console.log(data); });
+  $scope.delete = function(data_id) {
+    if (confirm("Delete This Entry?") == true) {
+      $http({ method: 'GET', url: '../../delete/data?' + data_id})
+        .success(function(data, status) { $scope.items = data; console.log(data); });
+    }
+};
+{% endif %}
+
+}) ///
+
+</script>
+</head>
+<body>
+  <div class="user_gate" ng-show="huDisplay=='on'"><a href="{{ login_key }}">{{ gate }}</a>{% if user_name != 'No User' %}<br />{{ user_name }}{% if admin == 'true' %}<p class="color_a">admin</p>{% endif %}{% endif %}</div>
+  <aside class="left_aside" ng-show="huDisplay=='on'">
+
+    <nav class="main_nav"><ul>
+      <a href="../../programs"><li id="programsNav">Programs</li></a>
+      <a href="../../results"><li id="resultsNav">Results</li></a>
+      <a href="../../exercises"><li id="exercisesNav">Exercises</li></a>
+      <a href="../../about"><li id="aboutNav">About</li></a>
+    </ul></nav><!-- - /main_nav - -->
+  </aside>
+  <main class="page_wrap">
+    {{ page_html|safe }}
+
+  </main><!-- - /page_wrap - -->
+  <div class="nav_graphic" ng-show="huDisplay=='off'" ng-click="huDisplay='on'">&#9776;</div>
+  <div class="nav_graphic" ng-show="huDisplay=='on'" ng-click="huDisplay='off'">&#10226;</div>
+</body>
+</html>
