@@ -10,24 +10,13 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-- kind: Form_db
+- kind: Exercise_db
   properties:
-  - name: addTime
-    direction: desc
+  - name: add_time
   - name: data_id
-  - name: email_address
+  - name: exercise_class
+  - name: exercise_name
+  - name: exercise_type
+  - name: exercise_video_key
   - name: user_name
 
-- kind: Form_db
-  properties:
-  - name: data_id
-  - name: email_address
-  - name: user_name
-
-- kind: Form_db
-  properties:
-  - name: visibility
-  - name: data_id
-  - name: data_type
-  - name: email_address
-  - name: user_name

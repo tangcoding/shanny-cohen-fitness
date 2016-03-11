@@ -7,6 +7,7 @@
 <link href="http://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
 <style type="text/css">
 body { font-family: 'Raleway', sans-serif; color: #839496; }
+.hide{display: none;}
 
 .user_gate { font-size: 12px; text-align: right; position: fixed; top: 10px; right: 10px;  }
 .user_gate a { color: blue; text-decoration: none; }
@@ -60,14 +61,58 @@ var demo = angular.module("demo", [],
 demo.controller('Ctrl', function($scope, $http) {
   $scope.huDisplay = 'on';
 
+{% if page_id == 'manage_exercise' %}
+
+  $scope.exercise_data = ''; 
+  $scope.video_url = ''
+
+  $http({ method: 'GET', url: '/list_data?exercise' })
+  .success(function(data, status) { 
+    $scope.exercise_data = data; 
+  });
+
+  $scope.delete = function(data_id) {
+    if (confirm("Delete This Entry?") == true) {
+      $http({ method: 'GET', url: '/delete_data?exercise?' + data_id})
+        .success(function(data, status) { 
+          $scope.exercise_data = data; 
+      });
+    }
+  };
+
+{% endif %}
+
+{% if page_id == 'edit_exercise' %}
+  $scope.data_id = {{data_id}};
+  $scope.exercise_name = ''; 
+  $scope.exercise_type = ''; 
+  $scope.exercise_class = '';       
+
+  $http({ method: 'GET', url: '/list_data?exercise?' + $scope.data_id })
+  .success(function(data, status) { 
+    $scope.exercise_name = data.exercise_name; 
+    $scope.exercise_type = data.exercise_type; 
+    $scope.exercise_class = data.exercise_class;
+  });
+{% endif %}
+
+{% if page_id == 'publish_exercise_video' %}
+  $scope.data_id = {{data_id}};    
+
+  $http({ method: 'GET', url: '/list_data?exercise?' + $scope.data_id })
+  .success(function(data, status) { 
+    $scope.exercise_name = data.exercise_name; 
+  });
+{% endif %}
+
 {% if page_id == 'entries' %}
   $scope.items = [];
   $http({ method: 'GET', url: '../../list/entries' })
-  .success(function(data, status) { $scope.items = data; console.log(data); });
+  .success(function(data, status) { $scope.items = data; });
   $scope.delete = function(data_id) {
     if (confirm("Delete This Entry?") == true) {
       $http({ method: 'GET', url: '../../delete/data?' + data_id})
-        .success(function(data, status) { $scope.items = data; console.log(data); });
+        .success(function(data, status) { $scope.items = data;  });
     }
 };
 {% endif %}
@@ -79,18 +124,12 @@ demo.controller('Ctrl', function($scope, $http) {
 <body>
   <div class="user_gate" ng-show="huDisplay=='on'"><a href="{{ login_key }}">{{ gate }}</a>{% if user_name != 'No User' %}<br />{{ user_name }}{% if admin == 'true' %}<p class="color_a">admin</p>{% endif %}{% endif %}</div>
   <aside class="left_aside" ng-show="huDisplay=='on'">
-
-    <nav class="main_nav"><ul>
-      <a href="../../programs"><li id="programsNav">Programs</li></a>
-      <a href="../../results"><li id="resultsNav">Results</li></a>
-      <a href="../../exercises"><li id="exercisesNav">Exercises</li></a>
-      <a href="../../about"><li id="aboutNav">About</li></a>
-    </ul></nav><!-- - /main_nav - -->
+    {{nav_html|safe}}
   </aside>
   <main class="page_wrap">
     {{ page_html|safe }}
-
   </main><!-- - /page_wrap - -->
+<!--   <div class="hide" id="hide_data_id">{{data_id}}</div> -->
   <div class="nav_graphic" ng-show="huDisplay=='off'" ng-click="huDisplay='on'">&#9776;</div>
   <div class="nav_graphic" ng-show="huDisplay=='on'" ng-click="huDisplay='off'">&#10226;</div>
 </body>
