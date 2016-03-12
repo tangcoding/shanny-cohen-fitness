@@ -88,10 +88,26 @@ results_page_html = '''
   </div><!-- . main_wrap - -->
 '''
 exercises_page_html = '''
+  <style type="text/css">
+    .exercise_data{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
+    .img_wrap{width: 40%}
+    .text_wrap{width: 50%;}
+    .img_wrap, .text_wrap{display: inline-block; vertical-align: top;}
+  </style>
   <div class="main_wrap">
-  Exercises Page
-    <img src="../../pics/exercise.jpg" />
-  </div><!-- . main_wrap - -->
+    <div class="exercise_data" ng-repeat="item in exercise_data">
+      <div class="text_wrap">
+        <p> Exercise Name:  [! item.exercise_name !] </p>  
+        <p> Exercise Type:  [! item.exercise_type !] </p> 
+        <p> Exercise Class:  [! item.exercise_class !] </p> 
+        <p ng-show='item.exercise_video_key'> <a ng-href="/view_video/[!item.exercise_video_key!]" target="_blank"> View Video </a></p>
+      </div><!--.text_wrap-->
+
+      <div class="img_wrap">
+        <img ng-src="/render_img?medium?[!item.data_id!]">
+      </div><!--.img_wrap-->
+    </div><!--.exercise_data-->
+  </div><!-- .main_wrap -->
 '''
 about_page_html = '''<style>
   </style>
@@ -188,6 +204,7 @@ login_page_html = '''
 '''
 admin_nav_html = '''
   <nav class="main_nav"><ul>
+    <a href="../../"><li id="programsNav">Public</li></a>
     <a href="../../manage/exercise"><li id="programsNav">Exercise</li></a>
   </ul></nav><!-- - /main_nav - -->
 '''
@@ -213,20 +230,17 @@ manage_exercise_page_html = '''
         <p> Exercise Name:  [! item.exercise_name !] </p>  
         <p> Exercise Type:  [! item.exercise_type !] </p> 
         <p> Exercise Class:  [! item.exercise_class !] </p> 
+        <p ng-show='item.exercise_video_key'> <a ng-href="/view_video/[!item.exercise_video_key!]" target="_blank"> View Video </a></p>
       </div><!--.text_wrap-->
 
       <div class="img_wrap">
-        <img ng-src="/render_img?medium?[!item.data_id!]">
-        <p ng-show='item.exercise_video_key'> <a ng-href="/view_video/[!item.exercise_video_key!]" target="_blank"> View Video </a></p>
+        <img ng-src="/render_img?small?[!item.data_id!]">
       </div><!--.img_wrap-->
 
       <a ng-href='/edit/exercise?[!item.data_id!]'><button>Edit Info</button></a>
       <a ng-href='/publish/exercise_video?[!item.data_id!]'><button>Edit Video</button></a>
       <button ng-click="delete(item.data_id)">Delete Exercise</button>
-    </div>
-    <video controls id="exercise_video" class="hide">
-      <source ng-src="[!video_url!]" type="video/mp4">
-   </video>
+    </div><!--.exercise_data-->
   </div><!-- .main_wrap -->
 '''
 publish_exercise_page_html = '''
@@ -271,10 +285,11 @@ edit_exercise_page_html = '''
   .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
   tr { height: 32px; }
   td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  td img{max-width:70px;}
   input[type="text"] { width: 200px; height: 16px; }
   </style>
   <div class="main_wrap">
-   <header class="hi"><span class="color_b">Create New Exercise</span></header>
+   <header class="hi"><span class="color_b">Edit Exercise</span></header>
     <article class="form_wrap">
       <form action="../../manage/add_exercise" enctype="multipart/form-data" method="post">
         <table>
@@ -296,6 +311,10 @@ edit_exercise_page_html = '''
           </tr>
           <tr>
             <td class="label">Photo</td>
+            <td class="input"><img ng-src="/render_img?thumb?[!data_id!]"></td>
+          </tr>
+          <tr>
+            <td class="label"></td>
             <td class="input"><input type="file" name="exercise_photo"/></td>
           </tr>
           <tr>
@@ -374,7 +393,7 @@ class Exercise_db(ndb.Model):
 
     @classmethod
     def _get_all_data(self):
-        q = Exercise_db.query(projection=[Exercise_db.data_id, Exercise_db.add_time, Exercise_db.user_name, Exercise_db.exercise_name, Exercise_db.exercise_type, Exercise_db.exercise_class, Exercise_db.exercise_video_key])
+        q = ndb.gql('SELECT data_id, add_time, user_name, exercise_name, exercise_type, exercise_class, exercise_video_key FROM Exercise_db')
         db_data = []
         for item in q.iter():
             db_data.append({'data_id': item.data_id, 'add_time': str(item.add_time), 'user_name': item.user_name, 'exercise_name': item.exercise_name, 'exercise_type': item.exercise_type, 'exercise_class': item.exercise_class, 'exercise_video_key': item.exercise_video_key})
@@ -382,8 +401,10 @@ class Exercise_db(ndb.Model):
 
     @classmethod
     def _get_one_data(self,data_id):
-        item = Exercise_db.get_by_id(data_id)
-        db_data = {'data_id': item.data_id, 'add_time': str(item.add_time), 'user_name': item.user_name, 'exercise_name': item.exercise_name, 'exercise_type': item.exercise_type, 'exercise_class': item.exercise_class, 'exercise_video_key': item.exercise_video_key}
+        # item = Exercise_db.get_by_id(data_id)
+        q =ndb.gql('SELECT exercise_name, exercise_type, exercise_class from Exercise_db WHERE data_id= :1', data_id)
+        for item in q:
+          db_data = {'data_id': data_id, 'exercise_name': item.exercise_name, 'exercise_type': item.exercise_type, 'exercise_class': item.exercise_class}
         return json.dumps(db_data)
 
 class addExercise_db(webapp2.RequestHandler):
@@ -441,15 +462,13 @@ class listData(webapp2.RequestHandler):
         if len(split_address) == 3:
           data_id = split_address[2]
 
-        if users.is_current_user_admin():
+        if data_set == 'exercise' and not data_id:
+          self.response.headers['Content-Type'] = 'application/json'
+          self.response.out.write(Exercise_db._get_all_data()) 
 
-          if data_set == 'exercise' and not data_id:
-            self.response.headers['Content-Type'] = 'application/json'
-            self.response.out.write(Exercise_db._get_all_data()) 
-
-          if data_set == 'exercise' and data_id:
-            self.response.headers['Content-Type'] = 'application/json'
-            self.response.out.write(Exercise_db._get_one_data(data_id)) 
+        if data_set == 'exercise' and data_id:
+          self.response.headers['Content-Type'] = 'application/json'
+          self.response.out.write(Exercise_db._get_one_data(data_id)) 
 
 class RenderImg(webapp2.RequestHandler):
     def get(self):
@@ -461,11 +480,11 @@ class RenderImg(webapp2.RequestHandler):
         item = Exercise_db.get_by_id(data_id)
         img = images.Image(item.exercise_photo)
         if img_size == 'thumb':
-            img.resize(width=50)
-        if img_size == 'small':
             img.resize(width=70)
-        if img_size == 'medium':
+        if img_size == 'small':
             img.resize(width=250)
+        if img_size == 'medium':
+            img.resize(width=450)
         if img_size == 'large':
             img.resize(width=700)
         image = img.execute_transforms(output_encoding=images.JPEG)

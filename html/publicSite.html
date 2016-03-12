@@ -61,6 +61,15 @@ var demo = angular.module("demo", [],
 demo.controller('Ctrl', function($scope, $http) {
   $scope.huDisplay = 'on';
 
+{% if page_id == 'exercises' %}
+
+  $scope.exercise_data = ''; 
+  $http({ method: 'GET', url: '/list_data?exercise' })
+  .success(function(data, status) { 
+    $scope.exercise_data = data; 
+  });
+{% endif %}
+
 {% if page_id == 'manage_exercise' %}
 
   $scope.exercise_data = ''; 
@@ -79,7 +88,6 @@ demo.controller('Ctrl', function($scope, $http) {
       });
     }
   };
-
 {% endif %}
 
 {% if page_id == 'edit_exercise' %}
@@ -122,7 +130,17 @@ demo.controller('Ctrl', function($scope, $http) {
 </script>
 </head>
 <body>
-  <div class="user_gate" ng-show="huDisplay=='on'"><a href="{{ login_key }}">{{ gate }}</a>{% if user_name != 'No User' %}<br />{{ user_name }}{% if admin == 'true' %}<p class="color_a">admin</p>{% endif %}{% endif %}</div>
+  <div class="user_gate" ng-show="huDisplay=='on'">
+    {% if admin == 'true' %}<a href="/manage">manage</a>&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}
+      <a href="{{ login_key }}">{{ gate }}</a>
+    {% if user_name != 'No User' %}<br />
+    {{ user_name }}
+      {% if admin == 'true' %}
+      <p class="color_a">admin</p>
+      {% endif %}
+    {% endif %}
+  </div><!-- .user_gate -->
+
   <aside class="left_aside" ng-show="huDisplay=='on'">
     {{nav_html|safe}}
   </aside>
