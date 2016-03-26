@@ -1,5 +1,5 @@
 application: shanny-cohen-fitness
-version: 1
+version: 1-tang
 runtime: python27
 api_version: 1
 threadsafe: true

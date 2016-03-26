@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+# coding: latin-1
 
 Site = 'Shanny Cohen Fitness'
 
@@ -63,22 +64,80 @@ public_nav_html = '''
     <a href="../../about"><li id="aboutNav">About</li></a>
   </ul></nav><!-- - /main_nav - -->
 '''
-programs_page_html = '''<style>
-  .main_wrap img { width: 95%; }
+programs_page_html = '''
+  <style>
+    .package_wrap { display: inline-block; border: 1px solid #eee; border-radius: 4px; text-align: center; width: 300px; margin: 5px; vertical-align: top; padding: 5px; }
+    .package_wrap ul { padding-left: 20px; }
+    .package_wrap li { text-align: left; font-size: 14px; margin-bottom: 5px; }
   </style>
 
   <div class="main_wrap">
-  Programs Page
+    Programs Page
 
-  <ul>
-    <li>Strength and Conditioning</li>
-    <li>Weight Loss</li>
-    <li>Sport Specific Training</li>
-    <li>Post-Injury Exercise Rehab</li>
-    <li>Orthopedic Condition Specific Training</li>
-  </ul>
+    <ul>
+      <li>Strength and Conditioning</li>
+      <li>Weight Loss</li>
+      <li>Sport Specific Training</li>
+      <li>Post-Injury Exercise Rehab</li>
+      <li>Orthopedic Condition Specific Training</li>
+    </ul>
 
-  </div><!-- . main_wrap - -->
+  <div class="package_list">
+      <div class="package_wrap">
+        <div class="package_data">
+          <p class="package_title"><b>Platinum</b></p>
+          <p class="package_price">$550/Month</p>
+            <p class="package_info"> 7 day a week program that is fully customized to each client's goals, fitness level, physical injuries and health conditions.</p>
+              <ul class="package_list">
+                <li>Written workout available online or printable daily. Weekly workouts posted or emailed Sunday nights</li>
+                <li>Personalized daily video of the focus for reach exercise</li>
+                <li>Start and end point photos of each written exercise</li>
+                <li>Check in and feedback reports with Shanny throughout the week</li>
+                <li>Customized to your fitness goals</li>
+              </ul>
+        </div><!-- . package_data - -->
+      </div><!-- . package_wrap - -->
+      <div class="package_wrap">
+        <div class="package_data">
+          <p class="package_title"><b>Gold</b></p>
+          <p class="package_price">$330/Month</p>
+            <p class="package_info"> 3 day a week program that is fully customized to each client's goals, fitness level, physical injuries and health conditions.</p>
+              <ul class="package_list">
+                <li>Written workout available online or printable three times a week. Weekly workouts posted or emailed Sunday nights</li>
+                <li>Personalized daily video of the focus for each exercise</li>
+                <li>Start and end point photos of each written exercise</li>
+                <li>Check in and feedback reports with Shanny throughout the week </li>
+                <li>Customized to your fitness goals </li>
+              </ul>
+        </div><!-- . package_data - -->
+      </div><!-- . package_wrap - -->
+      <div class="package_wrap">
+        <div class="package_data">
+          <p class="package_title"><b>Silver</b></p>
+          <p class="package_price">$200/Month</p>
+            <p class="package_info">5 workouts a week emailed directly to you.</p>
+              <ul class="package_list">
+                <li>3 workout lifting videos</li>
+                <li>1 HIIT / class / abs</li>
+                <li>Focus on muscle definition, strength, endurance, weight loss, flexibility and balance</li>
+              </ul>
+        </div><!-- . package_data - -->
+      </div><!-- . package_wrap - -->
+      <div class="package_wrap">
+        <div class="package_data">
+          <p class="package_title"><b>Bronze</b></p>
+          <p class="package_price">$100/Month</p>
+            <p class="package_info">3 workouts a week emailed directly to you.</p>
+              <ul class="package_list">
+                <li>2 days of weight training</li>
+                <li>1 day of HIIIT/ class and abs</li>
+                <li>Focus on muscle definition, strength, endurance, weight loss, flexibility and balance</li>
+              </ul>
+        </div><!-- . package_data - -->
+      </div><!-- . package_wrap - -->
+    </div><!-- . package_list - —>
+
+    </div><!-- . main_wrap - -->
 '''
 results_page_html = '''
   <div class="main_wrap">
@@ -89,24 +148,84 @@ results_page_html = '''
 '''
 exercises_page_html = '''
   <style type="text/css">
-    .exercise_data{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
-    .img_wrap{width: 40%}
-    .text_wrap{width: 50%;}
+    #exercise_wrap{width:100%;}
+    #initial_category_wrap, .select_category_wrap, .select_data_wrap{width: 20%; display: inline-block; vertical-align: top; margin: 15px 1%;} 
+    .select_category_wrap{border: 1px solid grey;}
+    .select_data_wrap{width:75%;}
+    .exercise_data{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-bottom: 15px;}
+    .img_wrap{width: 30%}
+    .text_wrap{width: 60%;}
     .img_wrap, .text_wrap{display: inline-block; vertical-align: top;}
   </style>
   <div class="main_wrap">
-    <div class="exercise_data" ng-repeat="item in exercise_data">
-      <div class="text_wrap">
-        <p> Exercise Name:  [! item.exercise_name !] </p>  
-        <p> Exercise Type:  [! item.exercise_type !] </p> 
-        <p> Exercise Class:  [! item.exercise_class !] </p> 
-        <p ng-show='item.exercise_video_key'> <a ng-href="/view_video/[!item.exercise_video_key!]" target="_blank"> View Video </a></p>
-      </div><!--.text_wrap-->
 
-      <div class="img_wrap">
-        <img ng-src="/render_img?medium?[!item.data_id!]">
-      </div><!--.img_wrap-->
-    </div><!--.exercise_data-->
+    <div id="initial_category_wrap" ng-click="display_exercises()">
+      <label ng-repeat="muscle in muscles">
+        <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]" ng-model="muscle.selected" ng-click="toggle_selection(muscle.name)" class="hide"> [!muscle.name!]<br>        
+      </label>        
+      <label>
+        <input type="checkbox" name="select_all" value="select_all" ng-model="select_all" ng-click="select_all_exercises()" class="hide"> All Exercises<br>        
+      </label>       
+    </div><!--.initial_category_wrap-->
+
+   <div class="hide" id="exercise_wrap">
+
+      <div class="select_category_wrap">
+        <label>
+          <input type="checkbox" name="select_all" value="all" ng-click="select_all_exercises()" class="hide"> Select All<br>        
+        </label> 
+        <label>
+          <input type="checkbox" name="deselect_all" value="deselect_all"  ng-model="deselect_all"  ng-click="deselect_all_exercises()" class="hide"> Deselect All<br>        
+        </label> 
+        <hr>  
+        <label ng-repeat="muscle in muscles">
+          <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]" ng-model="muscle.selected" ng-click="toggle_selection(muscle.name)"> [!muscle.name!]<br>   
+        </label>            
+      </div><!--.select_category_wrap-->
+
+      <div class="select_data_wrap">
+       <p>Find [!display_data.length!] exercise(s)</p>
+       <hr>
+        <div class="exercise_data" ng-repeat="item in display_data">
+          <a ng-href="/exercise_detail/?data_id=[!item.data_id!]">
+          <div class="img_wrap">
+            <img ng-src="/render_img?medium?[!item.data_id!]">
+          </div><!--.img_wrap-->
+
+          <div class="text_wrap">
+            <p> Exercise Name:<br>[! item.exercise_name !] </p>  
+            <p> Equipment Type:<br>  [! item.equipment_type !] </p> 
+            <p> Muscle Targeted:<br>  [! item.muscle_targeted !] </p> 
+          </div><!--.text_wrap-->
+          </a>
+        </div><!--.exercise_data-->
+      </div><!--.select_data_wrap-->
+    </div><!--.exercise_wrap-->
+  </div><!-- .main_wrap -->
+'''
+exercise_detail_page_html = '''
+  <style>
+    .video_wrap{max-width:350px; max-height:250px;}
+    .video_wrap, .text_wrap{display:inline-block; vertical-align:top;margin: 15px 10px;}
+    .img_wrap{width: 100%; max-height: 400px; margin: 25 auto;}
+  </style>
+  <div class="main_wrap">
+    <div class="video_wrap" >
+      <video ng-show='item.exercise_video_key' width="300" height="200" ng-src="[!video_url!]" controls></video>
+    </div><!--.video_wrap-->
+
+    <div class="text_wrap">
+      <p> Exercise Name: [! item.exercise_name !] </p>  
+      <p> Equipment Type:  [! item.equipment_type !] </p> 
+      <p> Muscle Targeted:  [! item.muscle_targeted !] </p> 
+    </div><!--.text_wrap-->
+    <hr>
+
+    <div class="img_wrap">
+      <h3>[!item.exercise_name!] Images</h3>
+      <img ng-src="/render_img?medium?[!item.data_id!]">
+    </div><!--.img_wrap-->
+
   </div><!-- .main_wrap -->
 '''
 about_page_html = '''<style>
@@ -204,8 +323,9 @@ login_page_html = '''
 '''
 admin_nav_html = '''
   <nav class="main_nav"><ul>
-    <a href="../../"><li id="programsNav">Public</li></a>
-    <a href="../../manage/exercise"><li id="programsNav">Exercise</li></a>
+    <a href="../../"><li id="programsNav">&#8672; Public</li></a>
+    <a href="../../manage/client"><li id="clientNav">Client</li></a>
+    <a href="../../manage/exercise"><li id="exerciseNav">Exercise</li></a>
   </ul></nav><!-- - /main_nav - -->
 '''
 manage_page_html = '''
@@ -213,12 +333,16 @@ manage_page_html = '''
     <p>Choose a data set from the right to edit</p>
   </div><!-- .main_wrap -->
 '''
+
+#----------------------------------------------#
+#           Exersice Publish Manage            #
+#----------------------------------------------#
 manage_exercise_page_html = '''
   <style type="text/css">
     .exercise_data{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
-    .img_wrap{width: 40%}
-    .text_wrap{width: 50%;}
-    .img_wrap, .text_wrap{display: inline-block; vertical-align: top;}
+    .img_wrap{width: 15%}
+    .text_wrap{width: 80%;}
+    .img_wrap, .text_wrap{display: inline-block; vertical-align: top; margin-left:auto; margin-right:auto;}
   </style>
   <div class="main_wrap">
     <a href='/publish/exercise'><button>Add A New Exercise</button></a>
@@ -228,15 +352,16 @@ manage_exercise_page_html = '''
         <p> Add Time:  [! item.add_time | limitTo: 19 !] </p>
         <p> User: [! item.user_name !] </p>
         <p> Exercise Name:  [! item.exercise_name !] </p>  
-        <p> Exercise Type:  [! item.exercise_type !] </p> 
-        <p> Exercise Class:  [! item.exercise_class !] </p> 
+        <p> Equipment Type:  [! item.equipment_type !] </p> 
+        <p> Muscle Targeted:  [! item.muscle_targeted !] </p> 
         <p ng-show='item.exercise_video_key'> <a ng-href="/view_video/[!item.exercise_video_key!]" target="_blank"> View Video </a></p>
       </div><!--.text_wrap-->
 
       <div class="img_wrap">
-        <img ng-src="/render_img?small?[!item.data_id!]">
+        <img ng-src="/render_img?thumb?[!item.data_id!]">
       </div><!--.img_wrap-->
 
+      <br>
       <a ng-href='/edit/exercise?[!item.data_id!]'><button>Edit Info</button></a>
       <a ng-href='/publish/exercise_video?[!item.data_id!]'><button>Edit Video</button></a>
       <button ng-click="delete(item.data_id)">Delete Exercise</button>
@@ -260,12 +385,17 @@ publish_exercise_page_html = '''
             <td class="input"><input type="text" name="exercise_name" required/></td>
           </tr>
           <tr>
-            <td class="label">Type</td>
-            <td class="input"><input type="text" name="exercise_type" /></td>
+            <td class="label">Equipment Type</td>
+            <td class="input"><input type="text" name="equipment_type" /></td>
           </tr>
           <tr>
-            <td class="label">Class</td>
-            <td class="input"><input type="text" name="exercise_class" /></td>
+            <td class="label">Muscle Targeted</td>
+            <td class="input">
+              <label ng-repeat="muscle in muscles">
+                <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]"> [!muscle.name!]
+                <br>
+              </label>            
+            </td>
           </tr>
           <tr>
             <td class="label">Photo</td>
@@ -302,12 +432,16 @@ edit_exercise_page_html = '''
             <td class="input"><input type="text" name="exercise_name" ng-model='exercise_name' required/></td>
           </tr>
           <tr>
-            <td class="label">Type</td>
-            <td class="input"><input type="text" name="exercise_type" ng-model='exercise_type' /></td>
+            <td class="label">Equipment Type</td>
+            <td class="input"><input type="text" name="equipment_type" ng-model='equipment_type' /></td>
           </tr>
           <tr>
-            <td class="label">Class</td>
-            <td class="input"><input type="text" name="exercise_class" ng-model='exercise_class' /></td>
+            <td class="label">Muscle Targeted</td>
+            <td class="input">
+              <label ng-repeat="muscle in muscles">
+                <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]" ng-model="muscle.selected"> [!muscle.name!]<br>
+              </label>            
+            </td>
           </tr>
           <tr>
             <td class="label">Photo</td>
@@ -353,6 +487,86 @@ publish_exercise_video_page_html = '''
   </div><!-- - .main_wrap - -->  
 '''
 
+#----------------------------------------------#
+#             Client Publish Manage            #
+#----------------------------------------------#
+
+manage_client_page_html = '''
+  <style type="text/css">
+    .exercise_data{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
+    .img_wrap{width: 40%}
+    .text_wrap{width: 50%;}
+    .img_wrap, .text_wrap{display: inline-block; vertical-align: top;}
+  </style>
+  <div class="main_wrap">
+    <a href='/publish/client'><button>Add A New Client</button></a>
+    <hr>
+    <div class="exercise_data" ng-repeat="item in client_data">
+      <div class="text_wrap">
+        <p> Add Time:  [! item.add_time | limitTo: 19 !] </p>
+        <p> User: [! item.user_name !] </p>
+        <p> Client Name:  [! item.exercise_name !] </p>  
+        <p> Client Type:  [! item.exercise_type !] </p> 
+        <p> Client Class:  [! item.exercise_class !] </p> 
+        <p ng-show='item.exercise_video_key'> <a ng-href="/view_video/[!item.exercise_video_key!]" target="_blank"> View Video </a></p>
+      </div><!--.text_wrap-->
+
+      <div class="img_wrap">
+        <img ng-src="/render_img?small?[!item.data_id!]">
+      </div><!--.img_wrap-->
+
+      <a ng-href='/edit/exercise?[!item.data_id!]'><button>Edit Info</button></a>
+      <a ng-href='/publish/exercise_video?[!item.data_id!]'><button>Edit Video</button></a>
+      <button ng-click="delete(item.data_id)">Delete Exercise</button>
+    </div><!--.exercise_data-->
+  </div><!-- .main_wrap -->
+'''
+publish_client_page_html = '''  <style>
+  .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
+  tr { height: 32px; }
+  td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  input[type="text"] { width: 200px; height: 16px; }
+  </style>
+  <div class="main_wrap">
+    <header class="hi"><span class="color_b">Add New Client</span></header>
+    <article class="form_wrap">
+      <form action="../../add_client" enctype="multipart/form-data" method="post">
+        <table>
+          <tr>
+            <td class="label">Client Name</td>
+            <td class="input"><input type="text" name="client_name"/></td>
+          </tr>
+                    <tr>
+            <td class="label">Client Type</td>
+            <td class="input"><input type="text" name="client_type" /></td>
+          </tr>
+          <tr>
+            <td class="label">Client Class</td>
+            <td class="input"><input type="text" name="client_class" /></td>
+          </tr>
+          <tr>
+            <td class="label">Gmail</td>
+            <td class="input"><input type="text" name="client_gmail"/></td>
+          </tr>
+          <tr>
+            <td class="label">Phone</td>
+            <td class="input"><input type="text" name="client_phone"/></td>
+          </tr>
+          <tr>
+            <td class="label">Location</td>
+            <td class="input"><input type="text" name="client_location"/></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td style="text-align:right"><input type="submit" value="Add New Client" /></td>
+          </tr>
+        </table>
+      </form>
+    </article><!-- - /form_wrap - -->
+  </div><!-- - .main_wrap - --> 
+'''
+
+
 # - System
 import os
 import urllib
@@ -378,6 +592,58 @@ import datetime
 from pytz.gae import pytz
 
 
+#----------------------------------------------#
+#             Client Data Stucture             #
+#----------------------------------------------#
+class Client_db(ndb.Model):
+    add_time = ndb.DateTimeProperty(auto_now_add=True)
+    data_id = ndb.StringProperty()
+    #
+    user_name = ndb.StringProperty()
+    #
+    client_id = ndb.StringProperty()
+    client_name = ndb.StringProperty()
+    client_type = ndb.StringProperty()
+    client_class = ndb.StringProperty()
+    client_photo = ndb.BlobProperty()
+    client_gmail = ndb.StringProperty()
+    client_phone = ndb.StringProperty()
+    client_location = ndb.StringProperty()
+
+class addClient_db(webapp2.RequestHandler):
+    def post(self):
+
+      if users.is_current_user_admin():
+        data_id = self.request.get('data_id')
+        if data_id and data_id != '':
+          item = Client_db.get_by_id(data_id)
+        else:
+          date_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y%m%d%H%M%S")
+          data_id = date_time
+          item = Client_db(id=data_id)
+          item.data_id = data_id
+        # - -
+        item.user_name = users.get_current_user().nickname()
+        item.client_id = users.get_current_user().nickname()
+        item.client_type = self.request.get('client_type')
+        item.client_class = self.request.get('client_class')
+        item.client_photo = self.request.get('client_photo')
+        item.client_gmail = self.request.get('client_gmail')
+        item.client_phone = self.request.get('client_phone')
+        item.client_location = self.request.get('client_location')
+        
+        client_photo = self.request.get('client_photo')
+        if client_photo:
+          item.client_photo = images.resize(client_photo, 800, 600)
+        #
+        item.put()
+        time.sleep(1)
+        self.redirect('/manage/client')
+
+
+#----------------------------------------------#
+#           Exercise Data Stucture             #
+#----------------------------------------------#
 class Exercise_db(ndb.Model):
     add_time = ndb.DateTimeProperty(auto_now_add=True)
     data_id = ndb.StringProperty()
@@ -386,25 +652,26 @@ class Exercise_db(ndb.Model):
     #
     exercise_id = ndb.StringProperty()
     exercise_name = ndb.StringProperty()
-    exercise_type = ndb.StringProperty()
-    exercise_class = ndb.StringProperty()
+    equipment_type = ndb.StringProperty()
+    # muscle_targeted = ndb.StringProperty(repeated=True)
+    muscle_targeted = ndb.StringProperty()
     exercise_photo = ndb.BlobProperty()
     exercise_video_key = ndb.StringProperty()
 
     @classmethod
     def _get_all_data(self):
-        q = ndb.gql('SELECT data_id, add_time, user_name, exercise_name, exercise_type, exercise_class, exercise_video_key FROM Exercise_db')
+        q = ndb.gql('SELECT data_id, add_time, user_name, exercise_name, equipment_type, muscle_targeted, exercise_video_key FROM Exercise_db')
         db_data = []
         for item in q.iter():
-            db_data.append({'data_id': item.data_id, 'add_time': str(item.add_time), 'user_name': item.user_name, 'exercise_name': item.exercise_name, 'exercise_type': item.exercise_type, 'exercise_class': item.exercise_class, 'exercise_video_key': item.exercise_video_key})
+          db_data.append({'data_id': item.data_id, 'add_time': str(item.add_time), 'user_name': item.user_name, 'exercise_name': item.exercise_name, 'equipment_type': item.equipment_type, 'muscle_targeted': item.muscle_targeted, 'exercise_video_key': item.exercise_video_key})
         return json.dumps(db_data)
 
     @classmethod
     def _get_one_data(self,data_id):
         # item = Exercise_db.get_by_id(data_id)
-        q =ndb.gql('SELECT exercise_name, exercise_type, exercise_class from Exercise_db WHERE data_id= :1', data_id)
+        q =ndb.gql('SELECT exercise_name, equipment_type, muscle_targeted, exercise_video_key from Exercise_db WHERE data_id= :1', data_id)
         for item in q:
-          db_data = {'data_id': data_id, 'exercise_name': item.exercise_name, 'exercise_type': item.exercise_type, 'exercise_class': item.exercise_class}
+          db_data = {'data_id': data_id, 'exercise_name': item.exercise_name, 'equipment_type': item.equipment_type, 'muscle_targeted': item.muscle_targeted, 'exercise_video_key': item.exercise_video_key}
         return json.dumps(db_data)
 
 class addExercise_db(webapp2.RequestHandler):
@@ -423,8 +690,9 @@ class addExercise_db(webapp2.RequestHandler):
         item.user_name = users.get_current_user().nickname()
         item.exercise_id = self.request.get('exercise_id')
         item.exercise_name = self.request.get('exercise_name')
-        item.exercise_type = self.request.get('exercise_type')
-        item.exercise_class = self.request.get('exercise_class')
+        item.equipment_type = self.request.get('equipment_type')
+        muscle_targeted = self.request.POST.getall('muscle_targeted')
+        item.muscle_targeted = ', '.join(muscle_targeted)
         
         exercise_photo = self.request.get('exercise_photo')
         if exercise_photo:
@@ -470,6 +738,10 @@ class listData(webapp2.RequestHandler):
           self.response.headers['Content-Type'] = 'application/json'
           self.response.out.write(Exercise_db._get_one_data(data_id)) 
 
+
+#----------------------------------------------#
+#             Multi-Media Rendering            #
+#----------------------------------------------#
 class RenderImg(webapp2.RequestHandler):
     def get(self):
         page_address = self.request.uri
@@ -480,7 +752,7 @@ class RenderImg(webapp2.RequestHandler):
         item = Exercise_db.get_by_id(data_id)
         img = images.Image(item.exercise_photo)
         if img_size == 'thumb':
-            img.resize(width=70)
+            img.resize(width=100)
         if img_size == 'small':
             img.resize(width=250)
         if img_size == 'medium':
@@ -517,6 +789,9 @@ class UploadExerciseVideo(blobstore_handlers.BlobstoreUploadHandler):
         except:
             self.error(500)
 
+#----------------------------------------------#
+#             HTML Page Production             #
+#----------------------------------------------#
 class publicSite(webapp2.RequestHandler):
     def get(self):
       # - page url
@@ -560,6 +835,12 @@ class publicSite(webapp2.RequestHandler):
             page_name = 'Exercises'
             page_html = page_header + exercises_page_html
 
+        if path_layer == 'exercise_detail':
+            page_id = 'exercise_detail'
+            page_name = 'Exercises'
+            page_html = page_header + exercise_detail_page_html
+            data_id = self.request.get("data_id")
+
         if path_layer == 'about':
             page_id = 'about'
             page_name = 'About'
@@ -589,6 +870,12 @@ class publicSite(webapp2.RequestHandler):
                 nav_html = admin_nav_html
                 page_html = manage_exercise_page_html
 
+              if base == 'client':
+                page_id = 'client'
+                page_name = 'Manage Client'
+                nav_html = admin_nav_html
+                page_html = manage_client_page_html
+
           if path_layer == 'edit':
               if base == 'edit' or base == '':
                 page_id = 'edit'
@@ -617,6 +904,12 @@ class publicSite(webapp2.RequestHandler):
                 upload_url = blobstore.create_upload_url('/upload_exercise_video')
                 page_html = publish_exercise_video_page_html.format(upload_url)
                 data_id = base.split('?')[1]
+
+              if base == 'client':
+                page_id = 'client'
+                page_name = 'Publish Client'
+                nav_html = admin_nav_html
+                page_html = publish_client_page_html
 
           if path_layer == 'entries':
               page_id = 'entries'
@@ -661,16 +954,19 @@ app = webapp2.WSGIApplication([    # - Pages
     ('/programs/?', publicSite),
     ('/results/?', publicSite),
     ('/exercises/?', publicSite),
+    ('/exercise_detail/?', publicSite),
     ('/about/?', publicSite),
 
     ('/manage/?', publicSite),
     ('/manage/exercise/?', publicSite),
+    ('/manage/client/?', publicSite),
 
     ('/edit/?', publicSite),
     ('/edit/exercise/?', publicSite),
 
     ('/publish/exercise/?', publicSite),
     ('/publish/exercise_video?', publicSite),
+    ('/publish/client/?', publicSite),
 
     ('/manage/add_exercise/?', addExercise_db),
     ('/upload_exercise_video/?', UploadExerciseVideo),
@@ -682,7 +978,6 @@ app = webapp2.WSGIApplication([    # - Pages
     ('/entries/?', publicSite),
       ('/list_exercises/?', listData),
     ('/code/?', publicSite),
-
 
 ], debug=True)
 

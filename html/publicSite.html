@@ -32,7 +32,7 @@ body { font-family: 'Raleway', sans-serif; color: #839496; }
 .color_a { color: #2aa198; }
 .color_b { color: #657b83; }
 
-.main_wrap { width: 600px; margin: 0 auto; padding-top: 105px; }
+.main_wrap { width: 800px; margin: 0 auto; padding-top: 105px; }
 
 .page_wrap {  padding-bottom: 125px; margin-top: 25px; border-right: 1px solid #eee; }
 .page_wrap a { color: #268bd2; text-decoration: none; }
@@ -40,7 +40,7 @@ body { font-family: 'Raleway', sans-serif; color: #839496; }
 .main_wrap img { width: 95%; }
 
 
-@media only screen and (max-width: 1000px) { /* - Narrow Layout - */
+@media only screen and (max-width: 1200px) { /* - Narrow Layout - */
   .main_wrap { padding-left: 215px; }
 
 } /* - End Narrow - */
@@ -56,61 +56,155 @@ var demo = angular.module("demo", [],
   function($interpolateProvider) {
     $interpolateProvider.startSymbol('[!');
     $interpolateProvider.endSymbol('!]');
-}) ///
+})
 
-demo.controller('Ctrl', function($scope, $http) {
+demo.controller('Ctrl', function($scope, $http, $sce) {
   $scope.huDisplay = 'on';
+  $scope.muscles = [
+    { name: 'Abdominals', selected: false },
+    { name: 'Adductors', selected: false },
+    { name: 'Biceps', selected: false },
+    { name: 'Calves', selected: false },
+    { name: 'Chest', selected: false },
+    { name: 'Forearms', selected: false },
+    { name: 'Glutes', selected: false },
+    { name: 'Hamstrings', selected: false },
+    { name: 'Lats', selected: false },
+    { name: 'Lower Back', selected: false },
+    { name: 'Middle Back', selected: false },
+    { name: 'Neck', selected: false },
+    { name: 'Quadriceps', selected: false },
+    { name: 'Shoulders', selected: false },
+    { name: 'Traps', selected: false },
+    { name: 'Triceps', selected: false }
+  ];
 
 {% if page_id == 'exercises' %}
-
+  $scope.select_all = false;
+  $scope.deselect_all = false;
   $scope.exercise_data = ''; 
+  $scope.display_data = [];
   $http({ method: 'GET', url: '/list_data?exercise' })
   .success(function(data, status) { 
     $scope.exercise_data = data; 
+  });
+
+  $scope.selection = [];
+  $scope.toggle_selection = function(muscle){
+    var idx = $scope.selection.indexOf(muscle);
+    // is currently selected
+    if (idx > -1) {
+      $scope.selection.splice(idx, 1);
+    }
+    // is newly selected
+    else {
+      $scope.selection.push(muscle);
+    }
+    $scope.display_data = $scope.filter_data();
+  };
+
+  $scope.filter_data = function(){
+    var results = [];
+    for(var i = 0; i< $scope.exercise_data.length; i++){
+      for(var j = 0; j< $scope.selection.length; j++){
+        if($scope.exercise_data[i].muscle_targeted.indexOf($scope.selection[j]) > -1){
+          results.push($scope.exercise_data[i]);
+          break;
+        }
+      }
+    }
+    return results;
+  };
+
+  $scope.display_exercises = function(){
+    document.getElementById('exercise_wrap').style.display = "block";
+    document.getElementById('initial_category_wrap').style.display = "none";
+  };
+
+  $scope.select_all_exercises = function(muscle){
+    for(var i = 0; i< $scope.muscles.length; i++){
+      $scope.muscles[i].selected = true;
+    }
+    $scope.display_data = $scope.exercise_data;
+  };
+
+  $scope.deselect_all_exercises = function(muscle){
+    for(var i = 0; i< $scope.muscles.length; i++){
+      $scope.muscles[i].selected = false;
+    }
+    $scope.display_data = [];
+  };
+
+{% endif %}
+
+{% if page_id == 'exercise_detail' %}
+  $scope.data_id = {{data_id}};
+  $scope.item = ''; 
+  $scope.video_url = '';
+     
+  $http({ method: 'GET', url: '/list_data?exercise?' + $scope.data_id })
+  .success(function(data, status) { 
+    $scope.item = data; 
+    $scope.video_url = '/view_video/' + $scope.item.exercise_video_key;
+    $scope.video_url = $sce.trustAsResourceUrl($scope.video_url);
   });
 {% endif %}
 
 {% if page_id == 'manage_exercise' %}
+  {% if admin == 'true' %}
+    $scope.exercise_data = ''; 
+    $scope.video_url = ''
 
-  $scope.exercise_data = ''; 
-  $scope.video_url = ''
+    $http({ method: 'GET', url: '/list_data?exercise' })
+    .success(function(data, status) { 
+      $scope.exercise_data = data; 
+    });
 
-  $http({ method: 'GET', url: '/list_data?exercise' })
-  .success(function(data, status) { 
-    $scope.exercise_data = data; 
-  });
-
-  $scope.delete = function(data_id) {
-    if (confirm("Delete This Entry?") == true) {
-      $http({ method: 'GET', url: '/delete_data?exercise?' + data_id})
-        .success(function(data, status) { 
-          $scope.exercise_data = data; 
-      });
-    }
-  };
+    $scope.delete = function(data_id) {
+      if (confirm("Delete This Entry?") == true) {
+        $http({ method: 'GET', url: '/delete_data?exercise?' + data_id})
+          .success(function(data, status) { 
+            $scope.exercise_data = data; 
+        });
+      }
+    };
+  {% endif %}
 {% endif %}
 
 {% if page_id == 'edit_exercise' %}
-  $scope.data_id = {{data_id}};
-  $scope.exercise_name = ''; 
-  $scope.exercise_type = ''; 
-  $scope.exercise_class = '';       
+  {% if admin == 'true' %}
+    $scope.data_id = {{data_id}};
+    $scope.exercise_name = ''; 
+    $scope.equipment_type = ''; 
+    $scope.muscle_targeted = '';       
 
-  $http({ method: 'GET', url: '/list_data?exercise?' + $scope.data_id })
-  .success(function(data, status) { 
-    $scope.exercise_name = data.exercise_name; 
-    $scope.exercise_type = data.exercise_type; 
-    $scope.exercise_class = data.exercise_class;
-  });
+    $http({ method: 'GET', url: '/list_data?exercise?' + $scope.data_id })
+    .success(function(data, status) { 
+      $scope.exercise_name = data.exercise_name; 
+      $scope.equipment_type = data.equipment_type; 
+      $scope.muscle_targeted = data.muscle_targeted.split(", ");
+
+      for(var j =0; j < $scope.muscles.length; j++){
+        if( $scope.muscle_targeted.indexOf($scope.muscles[j].name) > -1 ){
+          $scope.muscles[j].selected = true;
+        }
+        else{
+          $scope.muscles[j].selected = false;
+        }
+      }
+    });
+  {% endif %}
 {% endif %}
 
 {% if page_id == 'publish_exercise_video' %}
-  $scope.data_id = {{data_id}};    
+  {% if admin == 'true' %}
+    $scope.data_id = {{data_id}};    
 
-  $http({ method: 'GET', url: '/list_data?exercise?' + $scope.data_id })
-  .success(function(data, status) { 
-    $scope.exercise_name = data.exercise_name; 
-  });
+    $http({ method: 'GET', url: '/list_data?exercise?' + $scope.data_id })
+    .success(function(data, status) { 
+      $scope.exercise_name = data.exercise_name; 
+    });
+  {% endif %} 
 {% endif %}
 
 {% if page_id == 'entries' %}
