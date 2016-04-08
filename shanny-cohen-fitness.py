@@ -60,7 +60,7 @@ public_nav_html = '''
     </ul>
     <div class="social_wrap">
       <a href="https://www.instagram.com/shannycohen_fitness/" target="_blank"><i class="fa fa-instagram"></i></a>
-      <a href="" target="_blank"><i class="fa fa-twitter-square"></i></a>
+      <a href="https://twitter.com/shannycohen_fit" target="_blank"><i class="fa fa-twitter-square"></i></a>
       <a href="https://www.facebook.com/ShannyCohenAthletePage/timeline" target="_blank"><i class="fa fa-facebook-official"></i></a>
       <a href="/contact"><i class="fa fa-question-circle"></i></a>
     </div><!-- . social_wrap - -->
