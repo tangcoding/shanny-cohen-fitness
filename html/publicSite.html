@@ -7,7 +7,7 @@
   <link href="//fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
   <style type="text/css">
-  body { font-family: 'Raleway', sans-serif; color: #ccc; }
+  body { font-family: 'Raleway', sans-serif; color: #777; }
   .hide{display: none;}
 
   .user_gate { font-size: 14px; text-align: right; position: fixed; top: 10px; right: 10px; z-index: 100; }
@@ -34,59 +34,158 @@
   .color_a { color: #B2DFDB; }
   .color_b { color: #657b83; }
 
-  .main_wrap { width: 1000px; margin: 0 auto; padding-top: 50px; margin-top: -10px;}
+  .main_wrap { width: 1000px; margin: 0 auto; padding-top: 50px; margin-top: -10px; margin-left: 175px;}
 
   .page_wrap {  padding-bottom: 125px;}
   .page_wrap a { color: #268bd2; text-decoration: none; }
 
   .main_wrap img { width: 95%; }
 
-
-  @media only screen and (max-width: 1200px) { /* - Narrow Layout - */
-    .main_wrap { padding-left: 215px; }
-
-  } /* - End Narrow - */
-
   header.hi { margin: 25px; font-size: 32px; width: 385px; padding: 10px; border-bottom: 1px solid blue; color: #aaa; letter-spacing: .08em; padding-left: 25px; }
 
   </style>
 
 {{ analytics|safe }}
-<script type="text/javascript" src="../../files/angular1.5.min.js"></script>
 <script type="text/javascript" src="../../files/jquery-2.2.2.min.js"></script>
+<script type="text/javascript" src="../../files/angular1.5.min.js"></script>
 <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 <script type="text/javascript">
-  Stripe.setPublishableKey('pk_test_eoy5MyiWnSIIBP4u695vrsxt');
-  jQuery(function($) {
-    $('#payment-form').submit(function(event) {
-      var $form = $(this);
-
-      // Disable the submit button to prevent repeated clicks
-      $form.find('button').prop('disabled', true);
-
-      Stripe.card.createToken($form, stripeResponseHandler);
-
-      // Prevent the form from submitting with the default action
-      return false;
+  {%if page_id == 'payment'%}
+    Stripe.setPublishableKey('xxxxxxxxxx');
+    jQuery(function($) {
+      $('#payment-form').submit(function(event) {
+        var $form = $(this);
+        // Disable the submit button to prevent repeated clicks
+        $form.find('button').prop('disabled', true);
+        Stripe.card.createToken($form, stripeResponseHandler);
+        // Prevent the form from submitting with the default action
+        return false;
+      });
     });
-  });
 
-  function stripeResponseHandler(status, response) {
-    var $form = $('#payment-form');
+    function stripeResponseHandler(status, response) {
+      var $form = $('#payment-form');
 
-    if (response.error) {
-      // Show the errors on the form
-      $form.find('.payment-errors').text(response.error.message);
-      $form.find('button').prop('disabled', false);
-    } else {
-      // response contains id and card, which contains additional card details
-      var token = response.id;
-      // Insert the token into the form so it gets submitted to the server
-      $form.append($('<input type="hidden" name="stripeToken" />').val(token));
-      // and submit
-      $form.get(0).submit();
-    }
-  };
+      if (response.error) {
+        // Show the errors on the form
+        $form.find('.payment-errors').text(response.error.message);
+        $form.find('button').prop('disabled', false);
+      } else {
+        // response contains id and card, which contains additional card details
+        var token = response.id;
+        // Insert the token into the form so it gets submitted to the server
+        $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+        // and submit
+        $form.get(0).submit();
+      }
+    };
+  {%endif%}
+
+  {% if page_id == 'exercise_detail' %}
+  // video controls
+  window.onload = function() {
+
+    var video = document.getElementById("video");
+
+    var playButton = $("#play-pause");
+    var muteButton = $("#mute");
+    var fullScreenButton = $("#full-screen");
+
+    var seekBar = $("#seek-bar");
+    var volumeBar = $("#volume-bar");
+
+    //video click play-pause 
+    video.addEventListener("click", function() {
+      if (video.paused == true) {
+        video.play();
+        playButton.html("<i class='fa fa-pause'></i>");
+      } else {
+        video.pause();
+        playButton.html("<i class='fa fa-play'></i>");
+      }
+    });
+
+    //play-pause button
+    playButton.on("click", function() {
+      if (video.paused == true) {
+        video.play();
+        playButton.html("<i class='fa fa-pause'></i>");
+      } else {
+        video.pause();
+        playButton.html("<i class='fa fa-play'></i>");
+      }
+    });
+
+    //mute button
+    muteButton.on("click", function() {
+      if (video.muted == false) {
+        video.muted = true;
+        muteButton.html("<i class='fa fa-volume-up'></i>");
+      } else {
+        video.muted = false;
+        muteButton.html("<i class='fa fa-volume-off'></i>");
+      }
+    });
+
+    //full-screen button
+    fullScreenButton.on("click", function() {
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if (video.mozRequestFullScreen) {
+        video.mozRequestFullScreen(); // Firefox
+      } else if (video.webkitRequestFullscreen) {
+        video.webkitRequestFullscreen(); // Chrome and Safari
+      }
+    });
+
+    // seek bar click
+    seekBar.on("change", function() {
+      var time = video.duration * (seekBar.val() / 100);
+      video.currentTime = time;
+      if(seekBar.val() > 99.9 ){
+        playButton.html("<i class='fa fa-play'></i>");
+      }
+      else{
+        playButton.html("<i class='fa fa-pause'></i>");      
+      }
+    });
+
+    // Update the seek bar as the video plays
+    video.addEventListener("timeupdate", function() {
+      var value = (100 / video.duration) * video.currentTime;
+      seekBar.val(value);
+      if(seekBar.val() > 99.9 ){
+        playButton.html("<i class='fa fa-play'></i>");
+      }
+      else{
+        playButton.html("<i class='fa fa-pause'></i>");  
+      }
+    });
+
+    // Pause the video when the slider handle is being dragged
+    seekBar.on("mousedown", function() {
+      video.pause();
+    });
+
+    // Play the video when the slider handle is dropped
+    seekBar.on("mouseup", function() {
+      video.play();
+    });
+
+    // Event listener for the volume bar
+    volumeBar.on("change", function() {
+      video.volume = volumeBar.val();
+      if(volumeBar.val() <0.01 ){
+        video.muted = true;
+        muteButton.html("<i class='fa fa-volume-up'></i>");
+      }
+      else {
+        video.muted = false;
+        muteButton.html("<i class='fa fa-volume-off'></i>");
+      }
+    });
+  }
+  {%endif%}
 </script>
 
 <script>
@@ -95,6 +194,56 @@ var demo = angular.module("demo", [],
     $interpolateProvider.startSymbol('[!');
     $interpolateProvider.endSymbol('!]');
 })
+
+demo.directive('testimonialView', function ($sce) {
+  var directive = {};
+  directive.restrict = 'E';
+  // directive.scope = { data: '=' };
+  directive.template ='<b>[! item.client_name!]</b> on [!item.add_time | limitTo: 10 !]:<br> <p class="testimonial_text"><span>[! text_part1 !]</span><span ng-show="!full_text">[!dot!]</span><span class="show_btn" ng-show="!full_text" ng-click="show_more_click()">[!show_more!]</span><span ng-show="full_text">[! text_part2 !]</span><span class="show_btn" ng-show="full_text" ng-click="show_less_click()">[!show_less!]</span></p><img class="testimonial_thumb" ng-click="show_lg_img()" ng-show="full_text" ng-src="[!img_url!]" >';
+  directive.link = function($scope) {
+    $scope.cut_num = 225;
+    $scope.full_text = false;
+    $scope.dot = '';
+    $scope.show_more = '';
+    $scope.show_less = '';
+    $scope.img_url = '';
+
+    if($scope.item.testimonial_text.length > $scope.cut_num) {
+      $scope.text_part1 = $scope.item.testimonial_text.slice(0, $scope.cut_num);
+      $scope.text_part2 = $scope.item.testimonial_text.slice($scope.cut_num);
+    }
+    else{
+      $scope.text_part1 = $scope.item.testimonial_text;
+      $scope.text_part2 = '';    
+    }
+
+    $scope.long_text = $scope.item.testimonial_text.length > $scope.cut_num;
+    if($scope.long_text||$scope.item.has_photo){
+
+      $scope.dot = '...';
+      $scope.show_more = 'Show More';
+      $scope.show_less = ' Show Less';
+    }
+
+    if($scope.item.has_photo){
+      $scope.img_url = '/render_img?testimonial?thumb?'+$scope.item.data_id;
+    }
+
+    $scope.show_more_click = function(){
+      $scope.full_text = true;   
+    }
+
+    $scope.show_less_click = function(){
+      $scope.full_text = false;   
+    }
+
+    $scope.show_lg_img = function(){
+      $scope.$parent.lg_img_url='/render_img?testimonial?large?'+$scope.item.data_id;
+      $scope.$parent.modal_show = true;
+    }
+  }
+  return directive;
+});
 
 demo.controller('Ctrl', function($scope, $http, $sce) {
   $scope.huDisplay = 'on';
@@ -122,21 +271,24 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     { name: 'Silver', price: 200 },
     { name: 'Bronze', price: 100 },
   ];
+  $scope.program_status_list = ['Active', 'Canceled', 'Other'];
 
 {% if page_id == 'programs' %}
   $scope.program_chosen='';
   $scope.client_number = [0,0]; // platinum and gold client number
+  $scope.platinum_avail = true;
+  $scope.gold_avail = true;
+
   $http({ method: 'GET', url: '/list_data?client_number' })
     .success(function(data, status) { 
       $scope.client_number = data; 
-      console.log($scope.client_number);
 
       if($scope.client_number[0] < 5){$scope.platinum_avail=true;}
       else {$scope.platinum_avail=false;}
 
       if($scope.client_number[1] < 5){$scope.gold_avail=true;}
       else {$scope.gold_avail=false;}
-    });
+  });
 
   $scope.confirm_signup=function(program_chosen){
     $scope.program_chosen = program_chosen;
@@ -146,10 +298,10 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     }
   };
 
-  $scope.add2wishlist=function(program_chosen){
+  $scope.add2waitlist=function(program_chosen){
     $scope.program_chosen = program_chosen;
     if($scope.program_chosen){
-      var url = '/add2wishlist/?program_chosen=' + $scope.program_chosen;
+      var url = '/add2waitlist/?program_chosen=' + $scope.program_chosen;
       window.location.replace(url);
     }
   };
@@ -176,7 +328,7 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   }
 {% endif %}
 
-{% if page_id == 'add2wishlist' %}
+{% if page_id == 'add2waitlist' %}
   $scope.program_chosen="{{program_chosen}}";
   $scope.client_email = "{{user_name}}";
 
@@ -185,37 +337,6 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
        if($scope.programs[i].name == $scope.program_chosen) $scope.price = $scope.programs[i].price;
      }
   }
-{% endif %}
-
-{% if page_id == 'my_program' %}
-  {% if user_name != 'No User' %} 
-    $scope.client_program='';
-    $scope.client_wishlist = '';
-    $scope.stripe_cus_id = '';
-    $scope.stripe_subscription_id = '';
-     $scope.program_status = '';
-
-    $http({ method: 'GET', url: '/list_data?current_client'})
-    .success(function(data, status) { 
-      $scope.client_program = data.client_program;
-      $scope.program_add_time = data.add_time;
-      $scope.program_status = data.program_status;
-      $scope.stripe_cus_id = data.stripe_cus_id;
-      $scope.stripe_subscription_id = data.stripe_subscription_id;
-    });
-
-    $http({ method: 'GET', url: '/list_data?current_wishlist'})
-    .success(function(data, status) { 
-      $scope.client_wishlist = data.client_program;
-      $scope.wishlist_add_time = data.add_time;
-    });
-
-    $scope.cancel_program = function(){
-      if (confirm("Are you sure you want to cancel the program?") == true) {
-        window.location.replace('/cancel_program');  
-      }
-    }
-  {% endif %}
 {% endif %}
 
 {% if page_id == 'payment' %}
@@ -240,9 +361,23 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% endif %}
 {% endif %}
 
+{% if page_id == 'results' %}
+    $scope.testimonial_data = ''; 
+    $scope.lg_img_url ='';
+    $scope.modal_show = false;
+
+    $http({ method: 'GET', url: '/list_data?testimonial' })
+    .success(function(data, status) { 
+      $scope.testimonial_data = data; 
+    });
+
+    $scope.hide_lg_img = function(){
+      $scope.lg_img_url ='';
+      $scope.modal_show = false;
+    }
+{% endif %}
+
 {% if page_id == 'exercises' %}
-  $scope.select_all = false;
-  $scope.deselect_all = false;
   $scope.exercise_data = ''; 
   $scope.display_data = [];
   $http({ method: 'GET', url: '/list_data?exercise' })
@@ -295,6 +430,9 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     }
     $scope.display_data = [];
   };
+  $scope.sel_by_name = function(){
+    $scope.select_all_exercises();
+  };
 {% endif %}
 
 {% if page_id == 'exercise_detail' %}
@@ -308,6 +446,126 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     $scope.video_url = '/view_video/' + $scope.item.exercise_video_key;
     $scope.video_url = $sce.trustAsResourceUrl($scope.video_url);
   });
+{% endif %}
+
+{% if page_id == 'my_program' %}
+  {% if user_name != 'No User' %} 
+    $scope.client_program='';
+    $scope.client_waitlist = '';
+    $scope.stripe_cus_id = '';
+    $scope.stripe_subscription_id = '';
+    $scope.program_status = '';
+    $scope.btn_disable = false;
+
+    $http({ method: 'GET', url: '/list_data?current_client'})
+    .success(function(data, status) { 
+      $scope.client_program = data.client_program;
+      $scope.program_add_time = data.add_time;
+      $scope.program_status = data.program_status;
+      $scope.stripe_cus_id = data.stripe_cus_id;
+      $scope.stripe_subscription_id = data.stripe_subscription_id;
+    });
+
+    $http({ method: 'GET', url: '/list_data?current_waitlist'})
+    .success(function(data, status) { 
+      $scope.client_waitlist = data.client_program;
+      $scope.waitlist_add_time = data.add_time;
+    });
+
+    $scope.cancel_program = function(){
+      if (confirm("Are you sure you want to cancel the program?") == true) {
+        $scope.btn_disable = true;
+        window.location.replace('/cancel_program');  
+      }
+    }
+  {% endif %}
+{% endif %}
+
+{% if page_id == 'my_info' %}
+  {% if user_name != 'No User' %} 
+    $scope.item = ''; 
+
+    $http({ method: 'GET', url: '/list_data?current_client'})
+    .success(function(data, status) { 
+      $scope.item = data; 
+    });
+  {% endif %}
+{% endif %}
+
+{% if page_id == 'edit_my_info' %}
+  {% if user_name != 'No User' %} 
+    $http({ method: 'GET', url: '/list_data?current_client'})
+    .success(function(data, status) { 
+      $scope.item = data; 
+      $scope.item.client_email="{{user_name}}";
+    });
+  {% endif %}
+{% endif %}
+
+{% if page_id == 'my_testimonial' %}
+  {% if user_name != 'No User' %} 
+    $scope.testimonial_data = ''; 
+    $scope.lg_img_url ='';
+    $scope.modal_show = false;
+
+    $http({ method: 'GET', url: '/list_data?current_testimonial' })
+    .success(function(data, status) { 
+      $scope.testimonial_data = data; 
+    });
+
+    $scope.hide_lg_img = function(){
+      $scope.lg_img_url ='';
+      $scope.modal_show = false;
+    }
+
+    $scope.delete = function(data_id) {
+      if (confirm("Delete This Entry?") == true) {
+        $http({ method: 'GET', url: '/delete_data?testimonial?' + data_id})
+          .success(function(data, status) { 
+            $scope.testimonial_data = data; 
+        });
+      }
+    };
+  {% endif %}
+{% endif %}
+
+{% if page_id == 'edit_my_testimonial' %}
+  {% if user_name != 'No User' %} 
+    $scope.data_id = "{{data_id}}";
+    $scope.item = '';      
+
+    $http({ method: 'GET', url: '/list_data?testimonial?' + $scope.data_id })
+    .success(function(data, status) { 
+      $scope.item = data; 
+    });
+  {% endif %}
+{% endif %}
+
+{% if page_id == 'manage_testimonial' %}
+  {% if admin == 'true' %}
+    $scope.testimonial_data = ''; 
+    $scope.lg_img_url ='';
+    $scope.modal_show = false;
+
+    $http({ method: 'GET', url: '/list_data?testimonial' })
+    .success(function(data, status) { 
+      $scope.testimonial_data = data; 
+    });
+
+    $scope.delete = function(data_id) {
+      if (confirm("Delete This Entry?") == true) {
+        $http({ method: 'GET', url: '/delete_data?testimonial?' + data_id})
+          .success(function(data, status) { 
+            $scope.testimonial_data = data; 
+        });
+      }
+    };
+
+    $scope.hide_lg_img = function(){
+      $scope.lg_img_url ='';
+      $scope.modal_show = false;
+    }
+  {% endif %}
 {% endif %}
 
 {% if page_id == 'manage_exercise' %}
@@ -334,6 +592,7 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
 {% if page_id == 'manage_client' %}
   {% if admin == 'true' %}
     $scope.client_data = ''; 
+    $scope.btn_disable = false;
 
     $http({ method: 'GET', url: '/list_data?client' })
     .success(function(data, status) { 
@@ -342,29 +601,37 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
 
     $scope.delete = function(data_id) {
       if (confirm("Remove This Client? This will also cancel his/her program.") == true) {
+        $scope.btn_disable = true;
         $http({ method: 'GET', url: '/delete_data?client?' + data_id})
-          .success(function(data, status) { 
-            $scope.client_data = data; 
+          .success(function(data, status) {
+            if(typeof(data)=='string'){
+              alert(data);
+              $scope.btn_disable = false;
+            }
+            else{
+              $scope.client_data = data; 
+              $scope.btn_disable = false;
+            }
         });
       }
     };
   {% endif %}
 {% endif %}
 
-{% if page_id == 'manage_wishlist' %}
+{% if page_id == 'manage_waitlist' %}
   {% if admin == 'true' %}
-    $scope.wishlist_data = ''; 
+    $scope.waitlist_data = ''; 
 
-    $http({ method: 'GET', url: '/list_data?wishlist' })
+    $http({ method: 'GET', url: '/list_data?waitlist' })
     .success(function(data, status) { 
-      $scope.wishlist_data = data; 
+      $scope.waitlist_data = data; 
     });
 
     $scope.delete = function(data_id) {
       if (confirm("Remove This Client?") == true) {
-        $http({ method: 'GET', url: '/delete_data?wishlist?' + data_id})
+        $http({ method: 'GET', url: '/delete_data?waitlist?' + data_id})
           .success(function(data, status) { 
-            $scope.wishlist_data = data; 
+            $scope.waitlist_data = data; 
         });
       }
     };
@@ -407,14 +674,25 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% endif %}
 {% endif %}
 
-{% if page_id == 'edit_wishlist' %}
+{% if page_id == 'edit_waitlist' %}
   {% if admin == 'true' %}
     $scope.data_id = "{{data_id}}"; 
 
-    $http({ method: 'GET', url: '/list_data?wishlist?' + $scope.data_id })
+    $http({ method: 'GET', url: '/list_data?waitlist?' + $scope.data_id })
     .success(function(data, status) { 
       $scope.item = data; 
-      console.log(data);
+    });
+  {% endif %}
+{% endif %}
+
+{% if page_id == 'edit_testimonial' %}
+  {% if admin == 'true' %}
+    $scope.data_id = "{{data_id}}";
+    $scope.item = '';      
+
+    $http({ method: 'GET', url: '/list_data?testimonial?' + $scope.data_id })
+    .success(function(data, status) { 
+      $scope.item = data; 
     });
   {% endif %}
 {% endif %}
@@ -436,7 +714,9 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
 <body>
   <div class="user_gate" ng-show="huDisplay=='on'">
     {% if user_name != 'No User' %} 
+      <a href="/my_testimonial"><button>My Testimonials</button></a>
       <a href="/my_program"><button>My Program</button></a>
+      <a href="/my_info"><button>My Info</button></a>
     {% endif %}
     {% if admin == 'true' %}<a href="/manage">manage</a>&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}
       <a href="{{ login_key }}">{{ gate }}</a>

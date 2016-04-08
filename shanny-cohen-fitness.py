@@ -37,7 +37,7 @@ main_page_html = '''<style></style>
 page_header = '''<style>
   header { width: 100%; }
   .sub_title { border-top: 1px solid #eee; }
-  .top_wrap { position: absolute; top: 0; left: 0; right: 0; height: 70px; }
+  .top_wrap { position: absolute; top: 0; left: 0; right: 0; height: 70px; width: 175px; }
   .social_wrap a { color: #fff; margin-bottom: 25px; padding-left: 10px;}
   .social_wrap a:hover { color: #444; }
 
@@ -62,19 +62,11 @@ public_nav_html = '''
       <a href="https://www.instagram.com/shannycohen_fitness/" target="_blank"><i class="fa fa-instagram"></i></a>
       <a href="" target="_blank"><i class="fa fa-twitter-square"></i></a>
       <a href="https://www.facebook.com/ShannyCohenAthletePage/timeline" target="_blank"><i class="fa fa-facebook-official"></i></a>
+      <a href="/contact"><i class="fa fa-question-circle"></i></a>
     </div><!-- . social_wrap - -->
     </nav><!-- - /main_nav - -->
 '''
-results_page_html = '''
-  <div class="main_wrap">
-  Results Page
-    <img src="../../pics/results.jpg" />
-
-  </div><!-- . main_wrap - -->
-'''
-about_page_html = '''<style>
-  </style>
-
+about_page_html = '''
   <div class="main_wrap">
     <img src="../../pics/home.jpg" />
   </div><!-- . main_wrap - -->
@@ -103,7 +95,7 @@ entries_page_html_admin = '''
       <form action="../../add_form" enctype="multipart/form-data" method="post">
         <table>
           <tr>
-            <td class="label">Email Addess</td>
+            <td class="label">Email Address</td>
             <td class="input"><input type="text" name="email_address" /></td>
           </tr>
           <tr>
@@ -169,13 +161,55 @@ admin_nav_html = '''
   <nav class="main_nav"><ul>
     <a href="../../"><li id="programsNav">&#8672; Public</li></a>
     <a href="../../manage/client"><li id="clientNav">Client</li></a>
-    <a href="../../manage/wishlist"><li id="wishlistNav">Wishlist</li></a>
+    <a href="../../manage/waitlist"><li id="waitlistNav">Waitlist</li></a>
     <a href="../../manage/exercise"><li id="exerciseNav">Exercise</li></a>
+    <a href="../../manage/testimonial"><li id="testimonialNav">Testimonial</li></a>
   </ul></nav><!-- - /main_nav - -->
 '''
 manage_page_html = '''
   <div class="main_wrap">
     <p>Choose a data set from the right to edit</p>
+  </div><!-- .main_wrap -->
+'''
+#----------------------------------------------#
+#           Contact me page                    #
+#----------------------------------------------#
+contact_page_html = '''
+  <style>
+  .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
+  tr { height: 32px; }
+  td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  </style>
+  <div class="main_wrap">
+    <header class="hi"><span class="color_b">Submit a Question</span></header>
+    <article class="form_wrap">
+      <form action="/submit_question"  method="post">
+        <table>
+          <tr>
+            <td class="label">Name*</td>
+            <td class="input"><input type="text" name="client_name" required/></td>
+          </tr>
+          <tr>
+            <td class="label">Email*</td>
+            <td class="input"><input type="email" name="client_email" required/></td>
+          </tr>
+          <tr>
+            <td class="label">Question</td>
+            <td class="input"><textarea name="client_question" rows="20" cols="30" required></textarea></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td style="text-align:right"><input type="submit" value="Submit" /></td>
+          </tr>
+        </table>
+      </form>
+    </article><!-- - /form_wrap - -->
+  </div><!-- - .main_wrap - -->
+'''
+contact_success_page_html = '''
+  <div class="main_wrap">
+  <h2>Your question has been submitted.</h2>
+  <h2>We'll reply as soon as possible.</h2>
   </div><!-- .main_wrap -->
 '''
 #----------------------------------------------#
@@ -199,18 +233,26 @@ exercises_page_html = '''
         <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]" ng-model="muscle.selected" ng-click="toggle_selection(muscle.name)" class="hide"> [!muscle.name!]<br>        
       </label>        
       <label>
-        <input type="checkbox" name="select_all" value="select_all" ng-model="select_all" ng-click="select_all_exercises()" class="hide"> All Exercises<br>        
+        <input type="checkbox" name="select_all" value="select_all" ng-click="select_all_exercises()" class="hide"> All Exercises<br>        
       </label>       
     </div><!--.initial_category_wrap-->
 
    <div class="hide" id="exercise_wrap">
 
       <div class="select_category_wrap">
+
+        <form ng-submit='sel_by_name()'>
+          <label>Seach by exercise name:</label><br>
+          <input type="text" placeholder="e.g. Push Ups" ng-model='select_name' ng-change='sel_by_name()'>
+          <input class="hide" type="submit" value="Submit" />
+        </from>
+
+        <hr>
         <label>
           <input type="checkbox" name="select_all" value="all" ng-click="select_all_exercises()" class="hide"> Select All<br>        
         </label> 
         <label>
-          <input type="checkbox" name="deselect_all" value="deselect_all"  ng-model="deselect_all"  ng-click="deselect_all_exercises()" class="hide"> Deselect All<br>        
+          <input type="checkbox" name="deselect_all" value="deselect_all" ng-click="deselect_all_exercises()" class="hide"> Deselect All<br>        
         </label> 
         <hr>  
         <label ng-repeat="muscle in muscles">
@@ -219,12 +261,12 @@ exercises_page_html = '''
       </div><!--.select_category_wrap-->
 
       <div class="select_data_wrap">
-       <p>Find [!display_data.length!] exercise(s)</p>
+       <p>Find [! (display_data| filter: select_name).length!] exercise(s)</p>
        <hr>
-        <div class="exercise_data" ng-repeat="item in display_data">
+        <div class="exercise_data" ng-repeat="item in display_data | filter: select_name ">
           <a ng-href="/exercise_detail/?data_id=[!item.data_id!]">
           <div class="img_wrap">
-            <img ng-src="/render_img?exercise?medium?[!item.data_id!]">
+            <img ng-src="/render_img?exercise?thumb?[!item.data_id!]">
           </div><!--.img_wrap-->
 
           <div class="text_wrap">
@@ -242,11 +284,22 @@ exercise_detail_page_html = '''
   <style>
     .video_wrap{max-width:350px; max-height:250px;}
     .video_wrap, .text_wrap{display:inline-block; vertical-align:top;margin: 15px 10px;}
+    .video_controls {opacity: 0; position: absolute; margin: 0 auto; width: 100%;}
+    .video_controls:hover {opacity: 1;}
+    #volume-bar{width: 50px;}
     .img_wrap{width: 100%; max-height: 400px; margin: 25 auto;}
   </style>
   <div class="main_wrap">
     <div class="video_wrap" >
-      <video ng-show='item.exercise_video_key' width="300" height="200" ng-src="[!video_url!]" controls></video>
+      <video id="video" ng-show='item.exercise_video_key' width="300" height="200" ng-src="[!video_url!]"></video>
+
+      <div id="video_controls">
+        <button type="button" id="play-pause"><i class="fa fa-play"></i></button>
+        <input type="range" id="seek-bar" value="0">
+        <button type="button" id="mute"><i class='fa fa-volume-off'></i></button>
+        <input type="range" id="volume-bar" min="0" max="1" step="0.1" value="1">
+        <button type="button" id="full-screen"><i class="fa fa-expand"></i></button>
+      </div><!--.video_controls-->
     </div><!--.video_wrap-->
 
     <div class="text_wrap">
@@ -258,7 +311,7 @@ exercise_detail_page_html = '''
 
     <div class="img_wrap">
       <h3>[!item.exercise_name!] Images</h3>
-      <img ng-src="/render_img?exercise?medium?[!item.data_id!]">
+      <img ng-src="/render_img?exercise?large?[!item.data_id!]">
     </div><!--.img_wrap-->
 
   </div><!-- .main_wrap -->
@@ -273,9 +326,14 @@ manage_exercise_page_html = '''
   <div class="main_wrap">
     <a href='/publish/exercise'><button>Add A New Exercise</button></a>
     <hr>
-    <div class="exercise_data" ng-repeat="item in exercise_data">
+    <div class="input-group">
+      <span>Seach by exercise name:</span>
+      <input ng-model='select_name' type="text" placeholder="e.g. Push Ups">
+    </div>
+
+    <div class="exercise_data" ng-repeat="item in exercise_data | filter:select_name">
       <div class="text_wrap">
-        <p> Add Time:  [! item.add_time | limitTo: 19 !] </p>
+        <p> Add Time:  [! item.add_time | limitTo: 10 !] </p>
         <p> User: [! item.user_name !] </p>
         <p> Exercise Name:  [! item.exercise_name !] </p>  
         <p> Equipment Type:  [! item.equipment_type !] </p> 
@@ -425,15 +483,14 @@ programs_page_html = '''
   .package_wrap li { text-align: left; font-size: 14px; margin-bottom: 5px; padding: 5px;}
   .package_title { color: black; background-image: linear-gradient(to right, rgba(0, 0, 0, 0), white, rgba(0, 0, 0, 0));}
   .package_info { background: rgba(255, 255, 255, 0.1); padding: 10px;}
-  .sign_up_text {color: red; }
-  .sign_up_btn {border:none; border-radius: 0; padding: 5px; font-size: 0.9rem;}
+  .sign_up_text {color: red; font-size:16px; }
+  .sign_up_btn {border:none; border-radius: 0; padding: 5px; font-size: 14px; margin: 0 5px;}
   </style>
 
   
   <div class="main_wrap">
   <h2 class="programs_title">Programs</h2>
-  <h3 class="programs_title" style='color:red'>Test Mode, Not use this page to Sign up now</h3>
-  <h3 class="programs_title" style='color:red'>Instead, please email shannycohen_fitness@gmail.com</h3>
+  <h3 class="programs_title" style='color:red'>Test Mode, Not use this page to Sign up now. <br> Instead, please email shannycohen.fitness@gmail.com</h3>
   <!--
   <ul>
     <li>Strength and Conditioning</li>
@@ -458,13 +515,10 @@ programs_page_html = '''
                 <li>Customized to your fitness goals</li>
               </ul>
         </div><!-- . package_data - -->
-        <div ng-show='platinum_avail'>
-          <h4 class="sign_up_text">* Limited Spots Available</h4>
-          <button class="sign_up_btn" ng-click=" confirm_signup('Platinum') ">Sign Up</button>
-        </div>
-        <div ng-show='!platinum_avail'>
-          <h4 class="sign_up_text">* Add to Wishlist</h4>
-          <button class="sign_up_btn" ng-click=" add2wishlist('Platinum') ">Add to Wishlist</button>
+        <div>
+          <p class="sign_up_text">* Limited Spots Available</p>
+          <button class="sign_up_btn" ng-disabled='!platinum_avail' ng-click=" confirm_signup('Platinum') ">Sign Up</button>
+          <button class="sign_up_btn" ng-disabled='platinum_avail' ng-click=" add2waitlist('Platinum') ">Add to Waitlist</button>
         </div>
       </div><!-- . package_wrap - -->
       <div class="package_wrap">
@@ -480,13 +534,10 @@ programs_page_html = '''
                 <li>Customized to your fitness goals </li>
               </ul>
         </div><!-- . package_data - -->
-        <div ng-show='gold_avail'>
-          <h4 class="sign_up_text">* Limited Spots Available</h4>
-          <button class="sign_up_btn" ng-click=" confirm_signup('Gold') ">Sign Up</button>
-        </div>
-        <div ng-show='!gold_avail'>
-          <h4 class="sign_up_text">* Add to Wishlist</h4>
-          <button class="sign_up_btn" ng-click=" add2wishlist('Gold') ">Add to Wishlist</button>
+        <div>
+          <p class="sign_up_text">* Limited Spots Available</p>
+          <button class="sign_up_btn" ng-disabled='!gold_avail' ng-click=" confirm_signup('Gold') ">Sign Up</button>
+          <button class="sign_up_btn" ng-disabled='gold_avail' ng-click=" add2waitlist('Gold') ">Add to Waitlist</button>
         </div>
       </div><!-- . package_wrap - -->
       <div class="package_wrap">
@@ -530,14 +581,14 @@ confirm_signup_page_html = '''
     <button class='confirm_signup_btn' ng-click="go2payment();">Go to Payment</button>
   </div><!-- .main_wrap -->
 '''
-add2wishlist_page_html = '''
+add2waitlist_page_html = '''
   <style>
   .confirm_signup_btn{display: inline-block; border-radius: 0; border: none; padding: 5px;}
   </style>
   <div class="main_wrap">
-    <p>You will be added to the Wishlist for [!program_chosen!] Program ($[!price!]/month).</p>
+    <p>You will be added to the Waitlist for [!program_chosen!] Program ($[!price!]/month).</p>
     <article class="form_wrap">
-      <form action="/add_wishlist" method="post">
+      <form action="/manage/add_waitlist" method="post">
         <table>
           <tr>
             <td class="label">Name</td>
@@ -552,6 +603,14 @@ add2wishlist_page_html = '''
             <td class="input"><input type="text" name="client_email" ng-model='client_email' required/></td>
           </tr>
           <tr>
+            <td class="label">Phone (optional)</td>
+            <td class="input"><input type="text" name="client_phone"/></td>
+          </tr>
+          <tr>
+            <td class="label">Adress (optional)</td>
+            <td class="input"><input type="text" name="client_address"/></td>
+          </tr>
+          <tr>
             <td></td>
             <td style="text-align:right">
               <a href='/programs'><button type='button' class='confirm_signup_btn'>Cancel</button></a>
@@ -564,15 +623,25 @@ add2wishlist_page_html = '''
 '''
 payment_page_html = '''
   <style>
-  .warning,.payment-errors{color:red;}
+  .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px;text-align:center;}
+  form{padding: 15px 45px;}
+  tr { height: 32px; }
+  td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  td.input { font-size: 14px; text-align: left; padding-left: 10px; }
+  .form_title{background: #0D47A1; padding: 10px; color:#fff;}
+  .payment-errors{color:red;}
+  .stripe_img{margin: 25px auto;}
+  button[type='submit']{border-radius:0; border: none; background: #0D47A1; color:#fff; padding: 5px; font-size: 12px;}
   </style>
   <div class="main_wrap">
-    <h3>[!program_chosen!] Program</h3>
-    <h3>Price: $[!price!]/month</h3>
-    <p class="warning" ng-show="program_status=='Active'">You have already enrolled in a program.</p>
   <article class="form_wrap">
+    <div class="form_title">
+      <h3>[!program_chosen!] Program</h3>
+      <h3>Price: $[!price!]/month</h3>
+    </div>
     <form action="/charge_card/" id="payment-form" method="post">
       <span class="payment-errors"></span>
+      <span class="payment-errors" ng-show="program_status=='Active'">You have already enrolled in a program.</span>
     <table>
       <tr>
         <td class="label">Name*</td>
@@ -591,6 +660,14 @@ payment_page_html = '''
         <td class="input"><input type="text" name="amout" ng-model="price" required/></td>
       </tr>     
       <tr>
+        <td class="label">Phone</td>
+        <td class="input"><input type="text" name="client_phone" /></td>
+      </tr>   
+      <tr>
+        <td class="label">Address</td>
+        <td class="input"><textarea type="text" name="client_address" rows="10" cols="20"></textarea></td>
+      </tr>   
+      <tr>
         <td class="label">Card Number*</td>
         <td class="input"><input type="text" size="20" data-stripe="number"/></td>
       </tr>
@@ -606,14 +683,14 @@ payment_page_html = '''
           <input type="text" size="4" data-stripe="exp-year"/>
         </td>
       </tr>
-        <tr>
-          <td></td>
-          <td style="text-align:right"><button type="submit" ng-disabled="program_status=='Active'">Subscribe to Program</button></td>
-        </tr>
+      <tr>
+        <td></td>
+        <td style="text-align:right"><button type="submit" ng-disabled="program_status=='Active'">Subscribe to Program</button></td>
+      </tr>
      </table>
     </form>
+    <img class="stripe_img" style="width:200px;" src='/pics/stripe.png'>
   </article><!-- - /form_wrap - -->
-  <p>*Secure Checkout Powered by Stripe</p>
   </div><!-- .main_wrap -->
 '''
 payment_success_page_html = '''
@@ -622,43 +699,364 @@ payment_success_page_html = '''
   <h2>You will recieve an email reciept.</h2>
   </div><!-- .main_wrap -->
 '''
-my_program_page_html = '''
-  <div class="main_wrap">
-    <div>
-      <p>Program: [!client_program!]</p> 
-        <p ng-show='client_program'>Since: [!program_add_time | limitTo: 19!]</p> 
-        <p ng-show='program_status'>Program Status: [!program_status !]</p> 
-        <a ng-show="program_status!='Canceled'&&client_program&&stripe_cus_id&&stripe_subscription_id" ng-click="cancel_program()"><button>Cancenl Program</button></a>
-        <p ng-show='comment'> [!comment!]</p> 
-    </div>
-    <hr>
-    <div>
-      <p>Wishlist: [!client_wishlist!]</p>
-        <p ng-show='client_wishlist'>Since: [!wishlist_add_time | limitTo: 19!]</p> 
-    </div>
-  </div><!-- .main_wrap -->
-'''
 cancel_program_success_page_html = '''
   <div class="main_wrap">
   <h2>Your have quit the program.</h2>
   </div><!-- .main_wrap -->
 '''
+
+#----------------------------------------------#
+#        Results and Testimonials              #
+#----------------------------------------------#
+results_page_html = '''
+  <style type="text/css">
+    .testimonial_wrap{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
+    .show_btn{color: steelblue;}
+    .testimonial_thumb{max-width:100px;}
+    .modal-backdrop{position: fixed; top: 0; left: 0; bottom: 0; right: 0;  z-index: 150;  background:rgba(0,0,0, 0.6);}
+    .modal{position: absolute; top:25px; z-index: 200; text-align: center; margin: auto auto;}
+    #lg_img{max-height: 600px; max-width: 800px; margin: auto auto;}
+    </style>
+  <div class="main_wrap">
+    Results and Testimonials
+    <hr>
+
+    <div class="modal-backdrop" ng-show="modal_show"></div>
+    <div class="modal" ng-show="modal_show">
+      <img id="lg_img" ng-src='[!lg_img_url!]'>
+      <button ng-click="hide_lg_img()">Close</button>
+    </div>
+
+    <div class="testimonial_wrap" ng-repeat="item in testimonial_data">
+      <testimonial-view data="item"></testimonial-view>
+    </div><!-- .testimonial_wrap -->
+  </div><!-- . main_wrap - -->
+'''
+manage_testimonial_page_html = '''
+  <style type="text/css">
+    .testimonial_wrap{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
+    .show_btn{color: steelblue;}
+    .testimonial_thumb{max-width:100px;}
+    .modal-backdrop{position: fixed; top: 0; left: 0; bottom: 0; right: 0;  z-index: 150;  background:rgba(0,0,0, 0.6);}
+    .modal{position: absolute; top:25px; z-index: 200; text-align: center; margin: auto auto;}
+    #lg_img{max-height: 600px; max-width: 800px; margin: auto auto;}
+  </style>
+  <div class="main_wrap">
+    <a href='/publish/testimonial'><button>Add A New Testimonial</button></a>
+    <hr>
+
+    <div class="modal-backdrop" ng-show="modal_show"></div>
+    <div class="modal" ng-show="modal_show">
+      <img id="lg_img" ng-src='[!lg_img_url!]'>
+      <button ng-click="hide_lg_img()">Close</button>
+    </div>
+
+    <div class="testimonial_wrap" ng-repeat="item in testimonial_data">
+      <testimonial-view></testimonial-view>
+      <br>
+      <a ng-href='/edit/testimonial?[!item.data_id!]'><button>Edit Info</button></a>
+      <button ng-click="delete(item.data_id)">Remove</button>
+    </div><!-- .testimonial_wrap -->
+
+  </div><!-- . main_wrap - -->
+'''
+edit_testimonial_page_html = '''
+  <style>
+  .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
+  tr { height: 32px; }
+  td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  input[type="text"] { width: 200px; height: 16px; }
+  </style>
+  <div class="main_wrap">
+   <header class="hi"><span class="color_b">Edit Testimonial</span></header>
+   <article class="form_wrap">
+      <form action="/manage/add_testimonial" enctype="multipart/form-data"  method="post">
+        <table>
+          <tr class="hide">
+            <td class="label">data_id</td>
+            <td class="input"><input type="text" name="data_id" ng-model='data_id' required/></td>
+          </tr>
+          <tr>
+            <td class="label">Name</td>
+            <td class="input"><input type="text" name="client_name" ng-model="item.client_name" required/></td>
+          </tr>
+          <tr>
+            <td class="label">Comment</td>
+            <td class="input"><textarea rows="20" cols="32" name="testimonial_text"  ng-model="item.testimonial_text" required></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Photo</td>
+            <td class="input"><input type="file" name="testimonial_photo"/></td>
+          </tr>
+          <tr>
+            <td class="label">
+             <img ng-src="[! item.has_photo?'/render_img?testimonial?thumb?'+item.data_id : '' !]">
+             </td>
+            <td class="input"></td>         
+          <tr>
+            <td></td>
+            <td style="text-align:right">
+              <a href="/manage/testimonial"><button type="button">Cancel</button></a>
+              <input type="submit" value="Save" />
+            </td>
+          </tr>
+        </table>
+      </form>
+    </article><!-- - /form_wrap - -->
+  </div><!-- - .main_wrap - --> 
+'''
+publish_testimonial_page_html = '''
+  <style>
+  .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
+  tr { height: 32px; }
+  td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  input[type="text"] { width: 200px; height: 16px; }
+  </style>
+  <div class="main_wrap">
+   <header class="hi"><span class="color_b">Add New Testimonial</span></header>
+   <article class="form_wrap">
+      <form action="/manage/add_testimonial" enctype="multipart/form-data"  method="post">
+        <table>
+        <table>
+          <tr>
+            <td class="label">Name</td>
+            <td class="input"><input type="text" name="client_name" required/></td>
+          </tr>
+          <tr>
+            <td class="label">Comment</td>
+            <td class="input"><textarea rows="20" cols="32" name="testimonial_text" required></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Photo</td>
+            <td class="input"><input type="file" name="testimonial_photo"/></td>
+          </tr>          
+          <tr>
+            <td></td>
+            <td style="text-align:right">
+              <a href="/manage/waitlist"><button type="button">Cancel</button></a>
+              <input type="submit" value="Save" />
+            </td>
+          </tr>
+        </table>
+      </form>
+    </article><!-- - /form_wrap - -->
+  </div><!-- - .main_wrap - --> 
+'''
+#----------------------------------------------#
+#             Client Interface                 #
+#----------------------------------------------#
+my_program_page_html = '''
+  <div class="main_wrap">
+    <div>
+      <p>Program: [!client_program!]</p> 
+        <p ng-show='program_status'>Program Status: [!program_status !]</p> 
+        <a ng-show="program_status!='Canceled'&&client_program&&stripe_cus_id&&stripe_subscription_id"><button ng-disabled="btn_disable" ng-click="cancel_program()">Cancenl Program</button></a>
+        <p ng-show='comment'> [!comment!]</p> 
+    </div>
+    <hr>
+    <div>
+      <p>Waitlist: [!client_waitlist!]</p>
+        <p ng-show='client_waitlist'>Since: [!waitlist_add_time | limitTo: 10!]</p> 
+    </div>
+  </div><!-- .main_wrap -->
+'''
+my_info_page_html = '''
+  <style type="text/css">
+    .client_data{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
+    .img_wrap{width: 15%}
+    .text_wrap{width: 75%;}
+    .img_wrap, .text_wrap{display: inline-block; vertical-align: top;}
+  </style>
+  <div class="main_wrap">
+    <div class="client_data">
+      <div class="text_wrap">
+        <p> Client Name:  [! item.client_name !] </p>  
+        <p> Phone:  [! item.client_phone !] </p> 
+        <p> Address:  [! item.client_address !] </p> 
+      </div><!--.text_wrap-->
+
+      <div class="img_wrap">
+        <img ng-src="[! item.has_photo?'/render_img?client?thumb?'+item.client_email : '' !]">
+      </div><!--.img_wrap-->
+
+      <br>
+      <a ng-href='/edit_my_info'><button ng-disabled="btn_disable">Edit Info</button></a>
+    </div><!--.client_data-->
+  </div><!-- .main_wrap -->
+'''
+edit_my_info_page_html = '''
+  <style>
+  .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
+  tr { height: 32px; }
+  td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  td img{max-width:70px;}
+  input[type="text"] { width: 200px; height: 16px; }
+  </style>
+  <div class="main_wrap">
+   <header class="hi"><span class="color_b">Edit Client [!item.client_email!]</span></header>
+    <article class="form_wrap">
+      <form action="/add_my_info" enctype="multipart/form-data" method="post">
+        <table>
+          <tr class="hide">
+            <td class="label">Email</td>
+            <td class="input"><input type="text" name="client_email" ng-model='item.client_email' required/></td>
+          </tr>
+          <tr>
+            <td class="label">Name</td>
+            <td class="input"><input type="text" name="client_name" ng-model='item.client_name' required/></td>
+          </tr>
+          <tr>
+            <td class="label">Phone</td>
+            <td class="input"><input type="text" name="client_phone" ng-model='item.client_phone'/></td>
+          </tr>
+          <tr>
+            <td class="label">Address</td>
+            <td class="input"><input type="text" name="client_address" ng-model='item.client_address'/></td>
+          </tr>
+          <tr>
+            <td class="label">Photo</td>
+            <td class="input"><input type="file" name="testimonial_photo"/></td>
+          </tr>
+          <tr>
+            <td class="label"><img ng-src="[! item.has_photo?'/render_img?client?thumb?'+item.client_email : '' !]"></td>
+            <td class="input"></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td style="text-align:right">
+              <a href="/manage/client"><button type="button">Cancel</button></a>
+              <input type="submit" value="Save" />
+            </td>
+          </tr>
+        </table>
+      </form>
+    </article><!-- - /form_wrap - -->
+  </div><!-- - .main_wrap - -->
+'''
+my_testimonial_page_html = '''
+  <style type="text/css">
+    .testimonial_wrap{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
+    .show_btn{color: steelblue;}
+    .testimonial_thumb{max-width:100px;}
+    .modal-backdrop{position: fixed; top: 0; left: 0; bottom: 0; right: 0;  z-index: 150;  background:rgba(0,0,0, 0.6);}
+    .modal{position: absolute; top:25px; z-index: 200; text-align: center; margin: auto auto;}
+    #lg_img{max-height: 600px; max-width: 800px; margin: auto auto;}
+    </style>
+  <div class="main_wrap">
+    <a href='/publish_my_testimonial'><button>Add A New Testimonial</button></a>
+    <hr>
+
+    <div class="modal-backdrop" ng-show="modal_show"></div>
+    <div class="modal" ng-show="modal_show">
+      <img id="lg_img" ng-src='[!lg_img_url!]'>
+      <button ng-click="hide_lg_img()">Close</button>
+    </div>
+
+    <div class="testimonial_wrap" ng-repeat="item in testimonial_data">
+      <testimonial-view data="item"></testimonial-view>
+      <br>
+      <a ng-href='/edit_my_testimonial/?data_id=[!item.data_id!]'><button>Edit Info</button></a>
+      <button ng-click="delete(item.data_id)">Remove</button>
+    </div><!-- .testimonial_wrap -->
+  </div><!-- . main_wrap - -->
+'''
+edit_my_testimonial_page_html = '''
+  <style>
+  .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
+  tr { height: 32px; }
+  td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  input[type="text"] { width: 200px; height: 16px; }
+  </style>
+  <div class="main_wrap">
+   <header class="hi"><span class="color_b">Edit Testimonial</span></header>
+   <article class="form_wrap">
+      <form action="/manage/add_testimonial" enctype="multipart/form-data"  method="post">
+        <table>
+          <tr class="hide">
+            <td class="label">data_id</td>
+            <td class="input"><input type="text" name="data_id" ng-model='data_id' required/></td>
+          </tr>
+          <tr>
+            <td class="label">Name</td>
+            <td class="input"><input type="text" name="client_name" ng-model="item.client_name" required/></td>
+          </tr>
+          <tr>
+            <td class="label">Comment</td>
+            <td class="input"><textarea rows="20" cols="32" name="testimonial_text"  ng-model="item.testimonial_text" required></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Photo</td>
+            <td class="input"><input type="file" name="testimonial_photo"/></td>
+          </tr>
+          <tr>
+            <td class="label">
+             <img ng-src="[! item.has_photo?'/render_img?testimonial?thumb?'+item.data_id : '' !]">
+             </td>
+            <td class="input"></td>         
+          <tr>
+            <td></td>
+            <td style="text-align:right">
+              <a href="/manage/testimonial"><button type="button">Cancel</button></a>
+              <input type="submit" value="Save" />
+            </td>
+          </tr>
+        </table>
+      </form>
+    </article><!-- - /form_wrap - -->
+  </div><!-- - .main_wrap - --> 
+'''
+publish_my_testimonial_page_html = '''
+  <style>
+  .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
+  tr { height: 32px; }
+  td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  input[type="text"] { width: 200px; height: 16px; }
+  </style>
+  <div class="main_wrap">
+   <header class="hi"><span class="color_b">Add New Testimonial</span></header>
+   <article class="form_wrap">
+      <form action="/manage/add_testimonial" enctype="multipart/form-data"  method="post">
+        <table>
+          <tr>
+            <td class="label">Name</td>
+            <td class="input"><input type="text" name="client_name" required/></td>
+          </tr>
+          <tr>
+            <td class="label">Comment</td>
+            <td class="input"><textarea rows="20" cols="32" name="testimonial_text" required></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Photo</td>
+            <td class="input"><input type="file" name="testimonial_photo"/></td>
+          </tr>          
+          <tr>
+            <td></td>
+            <td style="text-align:right">
+              <a href="/manage/waitlist"><button type="button">Cancel</button></a>
+              <input type="submit" value="Save" />
+            </td>
+          </tr>
+        </table>
+      </form>
+    </article><!-- - /form_wrap - -->
+  </div><!-- - .main_wrap - --> 
+'''
 #----------------------------------------------#
 #             Client Publish Manage            #
 #----------------------------------------------#
-
 manage_client_page_html = '''
   <style type="text/css">
     .client_data{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
-    .img_wrap{width: 40%}
-    .text_wrap{width: 50%;}
+    .img_wrap{width: 15%}
+    .text_wrap{width: 75%;}
     .img_wrap, .text_wrap{display: inline-block; vertical-align: top;}
   </style>
   <div class="main_wrap">
     <a href='/publish/client'><button>Add A New Client</button></a>
     <hr>
     <div class="client_data" ng-repeat="item in client_data" | orderBy: 'client_email'>
-        <p> Add Time:  [! item.add_time | limitTo: 19 !] </p>
+      <div class="text_wrap">
+        <p> Add Time:  [! item.add_time | limitTo: 10 !] </p>
         <p> Client Name:  [! item.client_name !] </p>  
         <p> Client Email:  [! item.client_email !] </p> 
         <p> Client Program:  [! item.client_program !] </p> 
@@ -667,9 +1065,16 @@ manage_client_page_html = '''
         <p> Address:  [! item.client_address !] </p> 
         <p>stripe_cus_id: [! item.stripe_cus_id !]</p>
         <p>stripe_subscription_id: [! item.stripe_subscription_id !]</p>
-        <a ng-href='/edit/client?[!item.client_email!]'><button>Edit Info</button></a>
-        <button ng-click="delete(item.client_email)">Remove</button>
-    </div><!--.exercise_data-->
+      </div><!--.text_wrap-->
+
+      <div class="img_wrap">
+        <img ng-src="[! item.has_photo?'/render_img?client?thumb?'+item.client_email : '' !]">
+      </div><!--.img_wrap-->
+
+      <br>
+      <a ng-href='/edit/client?[!item.client_email!]'><button ng-disabled="btn_disable">Edit Info</button></a>
+      <button ng-click="delete(item.client_email)" ng-disabled="btn_disable">Remove</button>
+    </div><!--.client_data-->
   </div><!-- .main_wrap -->
 '''
 edit_client_page_html = '''
@@ -695,35 +1100,35 @@ edit_client_page_html = '''
           </tr>
           <tr>
             <td class="label">Client Program</td>
-            <td class="input"><input type="text" name="client_program" ng-model='item.client_program' placeholder='Platinum or Gold or Silver or Bronze'/></td>
+            <td class="input">
+              <select ng-model='item.client_program' name="client_program">
+                <option ng-repeat="program in programs" value="[!program.name!]">[!program.name!]</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td class="label">Program Status</td>
-            <td class="input"><input type="text" name="program_status" ng-model='item.program_status' placeholder='Active or Canceled'/></td>
-          </tr>
-          <tr>
-            <td class="label">Stripe_cus_id</td>
-            <td class="input"><input type="text" name="stripe_cus_id" ng-model='item.stripe_cus_id'/></td>
-          </tr>
-          <tr>
-            <td class="label">stripe_subscription_id</td>
-            <td class="input"><input type="text" name="stripe_subscription_id" ng-model='item.stripe_subscription_id' /></td>
+            <td class="input">
+              <select ng-model='item.program_status' name="program_status">
+                <option ng-repeat="status in program_status_list" value="[!status!]">[!status!]</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td class="label">Phone</td>
             <td class="input"><input type="text" name="client_phone" ng-model='item.client_phone'/></td>
           </tr>
           <tr>
-            <td class="label">Addess</td>
+            <td class="label">Address</td>
             <td class="input"><input type="text" name="client_address" ng-model='item.client_address'/></td>
           </tr>
           <tr>
             <td class="label">Photo</td>
-            <td class="input"><img ng-src="/render_img?client?thumb?[!data_id!]"></td>
+            <td class="input"><input type="file" name="client_photo"/></td>
           </tr>
           <tr>
-            <td class="label"></td>
-            <td class="input"><input type="file" name="client_photo"/></td>
+            <td class="label"><img ng-src="[! item.has_photo?'/render_img?client?thumb?'+item.client_email : '' !]"></td>
+            <td class="input"></td>
           </tr>
           <tr>
             <td></td>
@@ -759,11 +1164,19 @@ publish_client_page_html = '''
           </tr>
           <tr>
             <td class="label">Client Program</td>
-            <td class="input"><input type="text" name="client_program" ng-model='client_program' placeholder='Platinum or Gold or Silver or Bronze'/></td>
+            <td class="input">
+              <select name="client_program">
+                <option ng-repeat="program in programs" value="[!program.name!]">[!program.name!]</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td class="label">Program Status</td>
-            <td class="input"><input type="text" name="program_status" ng-model='program_status' placeholder='Active or Canceled'/></td>
+            <td class="input">
+              <select name="program_status">
+                <option ng-repeat="status in program_status_list" value="[!status!]">[!status!]</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td class="label">Stripe_cus_id</td>
@@ -778,7 +1191,7 @@ publish_client_page_html = '''
             <td class="input"><input type="text" name="client_phone" ng-model='client_phone'/></td>
           </tr>
           <tr>
-            <td class="label">Addess</td>
+            <td class="label">Address</td>
             <td class="input"><input type="text" name="client_address" ng-model='client_address'/></td>
           </tr>
           <tr>
@@ -797,43 +1210,40 @@ publish_client_page_html = '''
     </article><!-- - /form_wrap - -->
   </div><!-- - .main_wrap - --> 
 '''
-
 #----------------------------------------------#
-#             Wishlist Publish Manage          #
+#             Waitlist Publish Manage          #
 #----------------------------------------------#
 
-manage_wishlist_page_html = '''
+manage_waitlist_page_html = '''
   <style type="text/css">
     .client_data{border: 1px solid grey; border-radius: 3px; text-align: left; padding: 10px; margin-top: 15px;}
-    .img_wrap{width: 40%}
-    .text_wrap{width: 50%;}
-    .img_wrap, .text_wrap{display: inline-block; vertical-align: top;}
   </style>
   <div class="main_wrap">
-    <a href='/publish/wishlist'><button>Add A New Client to Wishlist</button></a>
+    <a href='/publish/waitlist'><button>Add A New Client to Waitlist</button></a>
     <hr>
-    <div class="client_data" ng-repeat="item in wishlist_data" | orderBy: 'client_id'>
+    <div class="client_data" ng-repeat="item in waitlist_data" | orderBy: 'client_id'>
         <p> Add Time:  [! item.add_time | limitTo: 19 !] </p>
         <p> Client Name:  [! item.client_name !] </p>  
         <p> Client Email:  [! item.client_email !] </p> 
         <p> Client Program:  [! item.client_program !] </p> 
-        <a ng-href='/edit/wishlist?[!item.client_email!]'><button>Edit Info</button></a>
+        <p> Client Phone:  [! item.client_phone !] </p> 
+        <p> Client Address:  [! item.client_address !] </p> 
+        <a ng-href='/edit/waitlist?[!item.client_email!]'><button>Edit Info</button></a>
         <button ng-click="delete(item.client_email)">Remove</button>
     </div><!--.exercise_data-->
   </div><!-- .main_wrap -->
 '''
-edit_wishlist_page_html = '''
+edit_waitlist_page_html = '''
   <style>
   .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
   tr { height: 32px; }
   td.label { font-size: 14px; text-align: right; padding-right: 10px; }
-  td img{max-width:70px;}
   input[type="text"] { width: 200px; height: 16px; }
   </style>
   <div class="main_wrap">
-    <header class="hi"><span class="color_b">Edit a Client in Wishlist</span></header>
+    <header class="hi"><span class="color_b">Edit a Client in Waitlist</span></header>
    <article class="form_wrap">
-      <form action="/add_wishlist" method="post">
+      <form action="/manage/add_waitlist" method="post">
         <table>
           <tr>
             <td class="label">Name</td>
@@ -841,16 +1251,28 @@ edit_wishlist_page_html = '''
           </tr>
           <tr>
             <td class="label">Program</td>
-            <td class="input"><input type="text" name="client_program" ng-model="item.client_program" required/></td>
+            <td class="input">
+              <select name="client_program" ng-model="item.client_program">
+                <option ng-repeat="program in programs" value="[!program.name!]">[!program.name!]</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td class="label">Email</td>
             <td class="input"><input type="text" name="client_email" ng-model="item.client_email" required/></td>
           </tr>
           <tr>
+            <td class="label">Client Phone</td>
+            <td class="input"><input type="text" name="client_phone" ng-model="item.client_phone" /></td>
+          </tr>
+          <tr>
+            <td class="label">Client Address</td>
+            <td class="input"><input type="text" name="client_address" ng-model="item.client_address" /></td>
+          </tr>
+          <tr>
             <td></td>
             <td style="text-align:right">
-              <a href="/manage/wishlist"><button type="button">Cancel</button></a>
+              <a href="/manage/waitlist"><button type="button">Cancel</button></a>
               <input type="submit" value="Save" />
             </td>
           </tr>
@@ -859,7 +1281,7 @@ edit_wishlist_page_html = '''
     </article><!-- - /form_wrap - -->
   </div><!-- - .main_wrap - -->
 '''
-publish_wishlist_page_html = '''
+publish_waitlist_page_html = '''
   <style>
   .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
   tr { height: 32px; }
@@ -867,9 +1289,9 @@ publish_wishlist_page_html = '''
   input[type="text"] { width: 200px; height: 16px; }
   </style>
   <div class="main_wrap">
-   <header class="hi"><span class="color_b">Add New Client to Wishlist</span></header>
+   <header class="hi"><span class="color_b">Add New Client to Waitlist</span></header>
    <article class="form_wrap">
-      <form action="/add_wishlist" method="post">
+      <form action="/manage/add_waitlist" method="post">
         <table>
           <tr>
             <td class="label">Name</td>
@@ -877,16 +1299,28 @@ publish_wishlist_page_html = '''
           </tr>
           <tr>
             <td class="label">Program</td>
-            <td class="input"><input type="text" name="client_program" required/></td>
+            <td class="input">
+              <select name="client_program">
+                <option ng-repeat="program in programs" value="[!program.name!]">[!program.name!]</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td class="label">Email</td>
             <td class="input"><input type="text" name="client_email" required/></td>
           </tr>
           <tr>
+            <td class="label">Client Phone</td>
+            <td class="input"><input type="text" name="client_phone" /></td>
+          </tr>
+          <tr>
+            <td class="label">Client Address</td>
+            <td class="input"><input type="text" name="client_address" /></td>
+          </tr>
+          <tr>
             <td></td>
             <td style="text-align:right">
-              <a href="/manage/wishlist"><button type="button">Cancel</button></a>
+              <a href="/manage/waitlist"><button type="button">Cancel</button></a>
               <input type="submit" value="Save" />
             </td>
           </tr>
@@ -904,6 +1338,7 @@ import wsgiref.handlers
 import webapp2
 from webapp2_extras import routes
 import json
+import logging
 # - 
 from google.appengine.api import users
 from google.appengine.api import mail
@@ -925,7 +1360,25 @@ from pytz.gae import pytz
 import stripe
 
 #----------------------------------------------#
-#      Client and Wishlist Data Stucture       #
+#           Contact    page                    #
+#----------------------------------------------#
+class submitQuestion(webapp2.RequestHandler):
+  def post(self):
+    client_name = self.request.get('client_name')
+    client_email = self.request.get('client_email')
+    client_question = self.request.get('client_question')
+
+    #--mail to host
+    message = mail.EmailMessage(sender="Web Question <ShannyCohen.Fitness@gmail.com>",
+                        subject="Question")    
+    message.to = "ShannyCohen.Fitness@gmail.com"
+    message.body = "Name: " + str(client_name) + "\n Email: " + str(client_email) + "\n Question: \n" + str(client_question)
+    message.send()
+
+    self.redirect('/contact_success')
+
+#----------------------------------------------#
+#      Client and Waitlist Data Stucture       #
 #----------------------------------------------#
 class Client_db(ndb.Model):
     add_time = ndb.StringProperty()
@@ -936,10 +1389,11 @@ class Client_db(ndb.Model):
     program_status = ndb.StringProperty()
     stripe_cus_id = ndb.StringProperty()
     stripe_subscription_id = ndb.StringProperty()
-    client_photo = ndb.BlobProperty()
     client_email = ndb.StringProperty()
     client_phone = ndb.StringProperty()
     client_address = ndb.TextProperty()
+    has_photo = ndb.BooleanProperty()
+    client_photo = ndb.BlobProperty()
 
     @classmethod
     def _get_all_data(self):
@@ -985,26 +1439,16 @@ class Client_db(ndb.Model):
 class addClient_db(webapp2.RequestHandler):
     def post(self):
 
-      # user = users.get_current_user()
-      # item = Client_db(id=user.user_id())
-      # # - -
-      # item.client_name = self.request.get('client_name')
-      # item.client_id = user.user_id()
-      # item.client_type = self.request.get('client_type')
-      # item.client_email = user.nickname()
-      # item.client_status = 'Wishlist'
-
-      # item.put()
-      # time.sleep(1)
-      # self.redirect('/my_program')
       if users.is_current_user_admin():
-        data_id = self.request.get('data_id')
-        if data_id and data_id != '':
-          item = Client.get_by_id(data_id)
-        else:
-          client_email = self.request.get('client_email')
-          item = Client_db(id=client_email)
-          item.add_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y/%m/%d %H:%M:%S")
+
+        client_email = self.request.get('client_email')
+
+        if client_email and client_email != '':
+          item = Client_db.get_by_id(client_email)
+          if not item:
+            item = Client_db(id=client_email)
+            item.add_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y/%m/%d %H:%M:%S")
+
         # - -
         item.client_name = self.request.get('client_name')
         item.client_email = self.request.get('client_email')
@@ -1019,21 +1463,52 @@ class addClient_db(webapp2.RequestHandler):
         client_photo = self.request.get('client_photo')
         if client_photo:
           item.client_photo = images.resize(client_photo, 800, 600)
+          item.has_photo = True
+        else:
+          if not item.client_photo:
+            item.has_photo = False
         #
         item.put()
         time.sleep(1)
         self.redirect('/manage/client')
 
-class Wishlist_db(ndb.Model):
+class addClient_db_user(webapp2.RequestHandler):
+    def post(self):
+      client_email = self.request.get('client_email')
+      item = Client_db.get_by_id(client_email)
+
+      if not item:
+        item = Client_db(id=client_email)
+        item.client_email = self.request.get('client_email')
+        item.add_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y/%m/%d %H:%M:%S")
+
+      item.client_name = self.request.get('client_name')
+      item.client_phone = self.request.get('client_phone')
+      item.client_address = self.request.get('client_address')
+      
+      client_photo = self.request.get('client_photo')
+      if client_photo:
+        item.client_photo = images.resize(client_photo, 800, 600)
+        item.has_photo = True
+      else:
+        if not item.client_photo:
+          item.has_photo = False
+      #
+      item.put()
+      self.redirect('/my_info')
+
+class Waitlist_db(ndb.Model):
     add_time = ndb.StringProperty()
     #
     client_name = ndb.StringProperty()
     client_program = ndb.StringProperty()
     client_email = ndb.StringProperty()
+    client_phone = ndb.StringProperty()
+    client_address = ndb.TextProperty()
 
     @classmethod
     def _get_all_data(self):
-        q = Wishlist_db.query()
+        q = Waitlist_db.query()
         db_data = []
         for item in q.iter():
           db_data.append(item.to_dict())
@@ -1041,9 +1516,7 @@ class Wishlist_db(ndb.Model):
 
     @classmethod
     def _get_one_data(self,data_id):
-      print "lala"
-      item = Wishlist_db.get_by_id(data_id)
-      print item
+      item = Waitlist_db.get_by_id(data_id)
       if item:
         db_data = item.to_dict()
       else: 
@@ -1051,37 +1524,39 @@ class Wishlist_db(ndb.Model):
       return json.dumps(db_data)
 
     @classmethod
-    def _get_current_wishlist(self):
+    def _get_current_waitlist(self):
         client_email = users.get_current_user().email()
-        item = Wishlist_db.get_by_id(client_email)
+        item = Waitlist_db.get_by_id(client_email)
         if item:
           db_data = item.to_dict()
         else: 
           db_data = []
         return json.dumps(db_data)
 
-class addWishlist_db(webapp2.RequestHandler):
+class addWaitlist_db(webapp2.RequestHandler):
     def post(self):
 
-      client_email = self.request.get('client_email')
-      if client_email:
-        item = Wishlist_db.get_by_id(client_email)
-        if item:
-          item.client_program += ' ,' + self.request.get('client_program')
-        else:
-          item = Wishlist_db(id=client_email)
-          item.client_email = self.request.get('client_email')
+      if users.get_current_user():
+
+        client_email = self.request.get('client_email')
+        if client_email:
+          item = Waitlist_db.get_by_id(client_email)
+          if not item:
+            item = Waitlist_db(id=client_email)
+            item.client_email = self.request.get('client_email')
+            item.add_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y/%m/%d %H:%M:%S")
+
           item.client_program = self.request.get('client_program')
-          item.add_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y/%m/%d %H:%M:%S")
+          item.client_name = self.request.get('client_name')
+          item.client_phone = self.request.get('client_phone')
+          item.client_address = self.request.get('client_address')
+          item.put()
+          time.sleep(1)
 
-        item.client_name = self.request.get('client_name')
-        item.put()
-        time.sleep(1)
-
-        if users.is_current_user_admin():
-          self.redirect('/manage/wishlist')
-        else:
-          self.redirect('/my_program')
+          if users.is_current_user_admin():
+            self.redirect('/manage/waitlist')
+          else:
+            self.redirect('/my_program')
 
 #----------------------------------------------#
 #             Payment Records                  #
@@ -1090,7 +1565,7 @@ class chargeCard(webapp2.RequestHandler):
   def post(self):
 
     #- stripe key and plan
-    stripe.api_key = "xxxxxxxxxxxx"
+    stripe.api_key = "xxxxxxxxxx"
 
     # stripe.Plan.create(
     #   amount=55000,
@@ -1098,27 +1573,6 @@ class chargeCard(webapp2.RequestHandler):
     #   name='Platinum',
     #   currency='usd',
     #   id='Platinum')
-
-    # stripe.Plan.create(
-    #   amount=33000,
-    #   interval='month',
-    #   name='Gold',
-    #   currency='usd',
-    #   id='Gold')
-
-    # stripe.Plan.create(
-    #   amount=20000,
-    #   interval='month',
-    #   name='Silver',
-    #   currency='usd',
-    #   id='Silver')
-
-    # stripe.Plan.create(
-    #   amount=10000,
-    #   interval='day',
-    #   name='Bronze',
-    #   currency='usd',
-    #   id='Bronze')
 
     # Get the credit card details submitted by the form
     token = self.request.POST['stripeToken']
@@ -1132,6 +1586,10 @@ class chargeCard(webapp2.RequestHandler):
     item.client_name = self.request.get('client_name')
     item.client_email = self.request.get('client_email')
     item.client_program = self.request.get('client_program')
+    item.client_phone = self.request.get('client_phone')
+    item.client_address = self.request.get('client_address')
+    if not item.client_photo:
+      item.has_photo = False
     item.add_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y/%m/%d %H:%M:%S")
     
     # - create stripe customer
@@ -1142,13 +1600,29 @@ class chargeCard(webapp2.RequestHandler):
       email=item.client_email
       )
     except stripe.error.CardError, e:
-      self.response.headers['Content-Type'] = 'application/json'
-      self.response.out.write('error') 
+        self.response.out.write(str(e)) 
+    except stripe.error.RateLimitError, e:
+        self.response.out.write(str(e)) 
+    except stripe.error.InvalidRequestError, e:
+        self.response.out.write(str(e)) 
+    except stripe.error.AuthenticationError, e:
+        self.response.out.write(str(e)) 
+    except stripe.error.APIConnectionError, e:
+        self.response.out.write(str(e)) 
+    except stripe.error.StripeError, e:
+        self.response.out.write(str(e)) 
     else:
       item.program_status = 'Active'
       item.stripe_cus_id = customer["id"]
       item.stripe_subscription_id = customer["subscriptions"]["data"][0]["id"]
       item.put()
+
+      #--mail to client
+      message = mail.EmailMessage(sender="Shanny Cohen Fitness <ShannyCohen.Fitness@gmail.com>",
+                          subject="Confirmation of Program Enrollment")    
+      message.to = item.client_email
+      message.body = "You have enrolled in the following program: " + "\n " + str(item.client_program) + '\n\n Shanny Cohen Fitness'
+      message.send()
 
       self.redirect('/payment_success')
 
@@ -1156,7 +1630,7 @@ class cancelProgram(webapp2.RequestHandler):
   def get(self):
 
     #- stripe key 
-    stripe.api_key = "xxxxxxxxxxxx"
+    stripe.api_key = "xxxxxxxxxx"
 
     if users.get_current_user():
       client_email = users.get_current_user().email()
@@ -1165,9 +1639,18 @@ class cancelProgram(webapp2.RequestHandler):
       try:
         customer = stripe.Customer.retrieve(item.stripe_cus_id)
         customer.subscriptions.retrieve(item.stripe_subscription_id).delete()
-      except (RuntimeError, TypeError, NameError,ValueError):
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'status':'error'})) 
+      except stripe.error.CardError, e:
+        self.response.out.write(str(e)) 
+      except stripe.error.RateLimitError, e:
+        self.response.out.write(str(e)) 
+      except stripe.error.InvalidRequestError, e:
+        self.response.out.write(str(e)) 
+      except stripe.error.AuthenticationError, e:
+        self.response.out.write(str(e)) 
+      except stripe.error.APIConnectionError, e:
+        self.response.out.write(str(e)) 
+      except stripe.error.StripeError, e:
+        self.response.out.write(str(e)) 
       else:
         item.program_status = 'Canceled'
         item.put()
@@ -1175,25 +1658,109 @@ class cancelProgram(webapp2.RequestHandler):
 
 def cancelProgram_admin(client_email):
     #- stripe key 
-    stripe.api_key = "xxxxxxxxxxxx"
+    stripe.api_key = "xxxxxxxxxx"
 
     item = Client_db.get_by_id(client_email)
     if item.program_status == 'Active' and item.stripe_cus_id and item.stripe_subscription_id:
       try:
         customer = stripe.Customer.retrieve(item.stripe_cus_id)
         customer.subscriptions.retrieve(item.stripe_subscription_id).delete()
-      except (RuntimeError, TypeError, NameError,ValueError):
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'status':'error'})) 
+      except stripe.error.CardError, e:
+        return str(e) 
+      except stripe.error.RateLimitError, e:
+        return str(e) 
+      except stripe.error.InvalidRequestError, e:
+        return str(e) 
+      except stripe.error.AuthenticationError, e:
+        return str(e) 
+      except stripe.error.APIConnectionError, e:
+        return str(e) 
+      except stripe.error.StripeError, e:
+        return str(e) 
       else:
         item.program_status = 'Canceled'
         item.put()
+        return 'success'
 
 class redirect2Payment(webapp2.RequestHandler):
   def get(self):
     program_chosen = self.request.get('program_chosen')
     url = "http://payment.shannycohen.fitness/?program_chosen=" + program_chosen
     self.redirect(str(url), True)
+
+#----------------------------------------------#
+#           Testimonial Data Stucture          #
+#----------------------------------------------#
+class Testimonial_db(ndb.Model):
+    add_time = ndb.StringProperty()
+    data_id = ndb.StringProperty()
+    client_name = ndb.StringProperty()
+    client_email = ndb.StringProperty()
+    testimonial_text = ndb.TextProperty()
+    testimonial_photo = ndb.BlobProperty()
+    has_photo = ndb.BooleanProperty()
+
+    @classmethod
+    def _get_all_data(self):
+        q = Testimonial_db.query()
+        db_data = []
+        for item in q.iter():
+          db_data.append(item.to_dict(exclude=['testimonial_photo']))
+        return json.dumps(db_data)
+
+    @classmethod
+    def _get_one_data(self,data_id):
+        item = Testimonial_db.get_by_id(data_id)
+        if item:
+          db_data = item.to_dict(exclude=['testimonial_photo'])
+        else: 
+          db_data = []
+        return json.dumps(db_data)
+
+    @classmethod
+    def _get_current_testimonial(self):
+        client_email = users.get_current_user().email()
+        q = Testimonial_db.query(Testimonial_db.client_email == client_email)
+        db_data = []
+        for item in q.iter():
+          db_data.append(item.to_dict(exclude=['testimonial_photo']))
+        return json.dumps(db_data)
+
+class addTestimonial_db(webapp2.RequestHandler):
+    def post(self):
+
+      user = users.get_current_user()
+
+      if user:
+
+        data_id = self.request.get('data_id')
+        if data_id and data_id != '':
+          item = Testimonial_db.get_by_id(data_id)
+        else:
+          data_id = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y%m%d%H%M%S")
+          item = Testimonial_db(id=data_id)
+          item.data_id = data_id
+          item.add_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y/%m/%d %H:%M:%S")
+          item.client_email = user.email()
+
+        item.client_name = self.request.get('client_name')
+        item.testimonial_text= self.request.get('testimonial_text')
+
+        testimonial_photo = self.request.get('testimonial_photo')
+        if testimonial_photo:
+          item.testimonial_photo = images.resize(testimonial_photo, 800, 600)
+          item.has_photo = True
+        else:
+          if not item.testimonial_photo:
+            item.has_photo = False
+
+        item.put()
+        time.sleep(1)
+
+        if users.is_current_user_admin():
+          self.redirect('/manage/testimonial')
+        else:
+          self.redirect('/my_testimonial')
 
 #----------------------------------------------#
 #           Exercise Data Stucture             #
@@ -1236,8 +1803,7 @@ class addExercise_db(webapp2.RequestHandler):
         if data_id and data_id != '':
           item = Exercise_db.get_by_id(data_id)
         else:
-          date_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y%m%d%H%M%S")
-          data_id = date_time
+          data_id = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y%m%d%H%M%S")
           item = Exercise_db(id=data_id)
           item.data_id = data_id
         # - -
@@ -1283,17 +1849,27 @@ class deleteData(webapp2.RequestHandler):
 
         if data_set == "client":
           item = Client_db.get_by_id(data_id)
+          stripe_remove_msg = 'success'
           if item.program_status == 'Active' and item.stripe_cus_id and item.stripe_subscription_id:
-            cancelProgram_admin(data_id)
-          item.key.delete()
-          time.sleep(1)
-          self.redirect('/list_data?client')
+            stripe_remove_msg = cancelProgram_admin(data_id)
+          if stripe_remove_msg == 'success':
+            item.key.delete()
+            time.sleep(1)
+            self.redirect('/list_data?client')
+          else:
+            self.response.out.write("Error! " + stripe_remove_msg) 
 
-        if data_set == "wishlist":
-          item = Wishlist_db.get_by_id(data_id)
+        if data_set == "waitlist":
+          item = Waitlist_db.get_by_id(data_id)
           item.key.delete()
           time.sleep(1)
-          self.redirect('/list_data?wishlist')
+          self.redirect('/list_data?waitlist')
+
+        if data_set == "testimonial":
+          item = Testimonial_db.get_by_id(data_id)
+          item.key.delete()
+          time.sleep(1)
+          self.redirect('/list_data?testimonial')
 
 class listData(webapp2.RequestHandler):
     def get(self):
@@ -1329,17 +1905,29 @@ class listData(webapp2.RequestHandler):
           self.response.headers['Content-Type'] = 'application/json'
           self.response.out.write(Client_db._get_current_client()) 
 
-        if data_set == 'wishlist' and not data_id:
+        if data_set == 'waitlist' and not data_id:
           self.response.headers['Content-Type'] = 'application/json'
-          self.response.out.write(Wishlist_db._get_all_data()) 
+          self.response.out.write(Waitlist_db._get_all_data()) 
 
-        if data_set == 'wishlist' and data_id:
+        if data_set == 'waitlist' and data_id:
           self.response.headers['Content-Type'] = 'application/json'
-          self.response.out.write(Wishlist_db._get_one_data(data_id)) 
+          self.response.out.write(Waitlist_db._get_one_data(data_id)) 
 
-        if data_set == 'current_wishlist' and not data_id:
+        if data_set == 'current_waitlist' and not data_id:
           self.response.headers['Content-Type'] = 'application/json'
-          self.response.out.write(Wishlist_db._get_current_wishlist()) 
+          self.response.out.write(Waitlist_db._get_current_waitlist()) 
+
+        if data_set == 'testimonial' and not data_id:
+          self.response.headers['Content-Type'] = 'application/json'
+          self.response.out.write(Testimonial_db._get_all_data()) 
+
+        if data_set == 'testimonial' and data_id:
+          self.response.headers['Content-Type'] = 'application/json'
+          self.response.out.write(Testimonial_db._get_one_data(data_id)) 
+
+        if data_set == 'current_testimonial' and not data_id:
+          self.response.headers['Content-Type'] = 'application/json'
+          self.response.out.write(Testimonial_db._get_current_testimonial()) 
 
 #----------------------------------------------#
 #             Multi-Media Rendering            #
@@ -1360,6 +1948,10 @@ class RenderImg(webapp2.RequestHandler):
           item = Client_db.get_by_id(data_id)
           img = images.Image(item.client_photo)
 
+        if data_set == 'testimonial':
+          item = Testimonial_db.get_by_id(data_id)
+          img = images.Image(item.testimonial_photo)
+
         if img_size == 'thumb':
             img.resize(width=100)
         if img_size == 'small':
@@ -1367,7 +1959,7 @@ class RenderImg(webapp2.RequestHandler):
         if img_size == 'medium':
             img.resize(width=450)
         if img_size == 'large':
-            img.resize(width=700)
+            img.resize(width=800)
         image = img.execute_transforms(output_encoding=images.JPEG)
         self.response.headers['Content-Type'] = 'image/jpeg'
         self.response.out.write(image)
@@ -1431,61 +2023,6 @@ class publicSite(webapp2.RequestHandler):
         if users.is_current_user_admin():
             admin = 'true' 
 
-        if path_layer == 'programs':
-            page_id = 'programs'
-            page_name = 'Programs'
-            page_html = page_header + programs_page_html
-
-        if path_layer == 'confirm_signup':
-            page_id = 'confirm_signup'
-            page_name = 'Confirm Signup'
-            page_html = page_header + confirm_signup_page_html
-            program_chosen = self.request.get('program_chosen')
-
-        if path_layer == 'payment':
-            page_id = 'payment'
-            page_name = 'Payment'
-            if user:
-              page_html = page_header + payment_page_html
-              program_chosen = self.request.get('program_chosen')
-            else:
-              page_html = page_header + login_page_html
-
-        if path_layer == 'payment_success':
-            page_id = 'payment_success'
-            page_name = 'Payment Success'
-            page_html = page_header + payment_success_page_html
-
-        if path_layer == 'add2wishlist':
-            page_id = 'add2wishlist'
-            page_name = 'Add to Wishlist'
-            if user:   
-              page_html = page_header + add2wishlist_page_html
-              program_chosen = self.request.get('program_chosen')
-            else:
-              page_html = page_header + login_page_html
-
-        if path_layer == 'my_program':
-            page_id = 'my_program'
-            page_name = 'My Program'
-            if user:
-              page_html = page_header + my_program_page_html
-            else:
-              page_html = page_header + login_page_html
-
-        if path_layer == 'cancel_program_success':
-            page_id = 'cancel_program_success'
-            page_name = 'Cancel Program Success'
-            if user:
-              page_html = page_header + cancel_program_success_page_html
-            else:
-              page_html = page_header + login_page_html
-
-        if path_layer == 'results':
-            page_id = 'results'
-            page_name = 'Results'
-            page_html = page_header + results_page_html
-
         if path_layer == 'exercises':
             page_id = 'exercises'
             page_name = 'Exercises'
@@ -1502,6 +2039,42 @@ class publicSite(webapp2.RequestHandler):
             page_name = 'About'
             page_html = page_header + about_page_html
 
+        if path_layer == 'results':
+            page_id = 'results'
+            page_name = 'Results'
+            page_html = page_header + results_page_html
+
+        if path_layer == 'programs':
+            page_id = 'programs'
+            page_name = 'Programs'
+            page_html = page_header + programs_page_html
+
+        if path_layer == 'confirm_signup':
+            page_id = 'confirm_signup'
+            page_name = 'Confirm Signup'
+            page_html = page_header + confirm_signup_page_html
+            program_chosen = self.request.get('program_chosen')
+
+        if path_layer == 'payment_success':
+            page_id = 'payment_success'
+            page_name = 'Payment Success'
+            page_html = page_header + payment_success_page_html
+
+        if path_layer == 'cancel_program_success':
+            page_id = 'cancel_program_success'
+            page_name = 'Cancel Program Success'
+            page_html = page_header + cancel_program_success_page_html
+
+        if path_layer == 'contact':
+            page_id = 'contact'
+            page_name = 'Contact'
+            page_html = page_header + contact_page_html
+
+        if path_layer == 'contact_success':
+            page_id = 'contact_success'
+            page_name = 'Contact Success'
+            page_html = page_header + contact_success_page_html
+
         # - manage, edit, publish pages for public 
         if path_layer == 'manage' or path_layer == 'edit' or path_layer == 'publish':
             page_id = 'login_page'
@@ -1509,6 +2082,56 @@ class publicSite(webapp2.RequestHandler):
             nav_html = admin_nav_html
             page_html = manage_page_html
             page_class = 'manage'
+
+        # - some other pages for public 
+        if path_layer == 'payment' or path_layer == 'add2waitlist' or path_layer == 'my_program' or path_layer == 'my_info' or path_layer == 'edit_my_info' or path_layer == 'my_testimonial' or path_layer == 'publish_my_testimonial' or path_layer == 'edit_my_testimonial':
+          page_id = 'login_page'
+          page_name = 'Log in'
+          page_html = page_header + login_page_html
+
+        if user:
+          if path_layer == 'payment':
+              page_id = 'payment'
+              page_name = 'Payment'
+              page_html = page_header + payment_page_html
+              program_chosen = self.request.get('program_chosen')
+
+          if path_layer == 'add2waitlist':
+              page_id = 'add2waitlist'
+              page_name = 'Add to Waitlist'
+              page_html = page_header + add2waitlist_page_html
+              program_chosen = self.request.get('program_chosen')
+
+          if path_layer == 'my_program':
+              page_id = 'my_program'
+              page_name = 'My Program'
+              page_html = page_header + my_program_page_html
+
+          if path_layer == 'my_info':
+              page_id = 'my_info'
+              page_name = 'My Info'
+              page_html = page_header + my_info_page_html
+
+          if path_layer == 'edit_my_info':
+              page_id = 'edit_my_info'
+              page_name = 'Edit My Info'
+              page_html = page_header + edit_my_info_page_html
+
+          if path_layer == 'my_testimonial':
+              page_id = 'my_testimonial'
+              page_name = 'My Testimonial'
+              page_html = page_header + my_testimonial_page_html
+
+          if path_layer == 'publish_my_testimonial':
+              page_id = 'publish_my_testimonial'
+              page_name = 'Publish My Testimonial'
+              page_html = page_header + publish_my_testimonial_page_html
+
+          if path_layer == 'edit_my_testimonial':
+              page_id = 'edit_my_testimonial'
+              page_name = 'Edit My Testimonial'
+              page_html = page_header + edit_my_testimonial_page_html
+              data_id = self.request.get('data_id')
 
         # - manage, edit, publish pages for admin
         if admin == 'true':
@@ -1532,11 +2155,17 @@ class publicSite(webapp2.RequestHandler):
                 nav_html = admin_nav_html
                 page_html = manage_client_page_html
 
-              if base == 'wishlist':
-                page_id = 'manage_wishlist'
-                page_name = 'Manage Wishlist'
+              if base == 'waitlist':
+                page_id = 'manage_waitlist'
+                page_name = 'Manage Waitlist'
                 nav_html = admin_nav_html
-                page_html = manage_wishlist_page_html
+                page_html = manage_waitlist_page_html
+
+              if base == 'testimonial':
+                page_id = 'manage_testimonial'
+                page_name = 'Manage Testimonial'
+                nav_html = admin_nav_html
+                page_html = manage_testimonial_page_html
 
           if path_layer == 'edit':
               if base == 'edit' or base == '':
@@ -1559,11 +2188,18 @@ class publicSite(webapp2.RequestHandler):
                 page_html = edit_client_page_html
                 data_id = base.split('?')[1]
 
-              if base.startswith('wishlist'):
-                page_id = 'edit_wishlist'
-                page_name = 'Edit Wishlist'
+              if base.startswith('waitlist'):
+                page_id = 'edit_waitlist'
+                page_name = 'Edit Waitlist'
                 nav_html = admin_nav_html
-                page_html = edit_wishlist_page_html
+                page_html = edit_waitlist_page_html
+                data_id = base.split('?')[1]
+
+              if base.startswith('testimonial'):
+                page_id = 'edit_testimonial'
+                page_name = 'Edit Testimonial'
+                nav_html = admin_nav_html
+                page_html = edit_testimonial_page_html
                 data_id = base.split('?')[1]
 
           if path_layer == 'publish':
@@ -1587,12 +2223,18 @@ class publicSite(webapp2.RequestHandler):
                 nav_html = admin_nav_html
                 page_html = publish_client_page_html
 
-              if base == 'wishlist':
-                page_id = 'publish_wishlist'
-                page_name = 'Publish Wishlist'
+              if base == 'waitlist':
+                page_id = 'publish_waitlist'
+                page_name = 'Publish Waitlist'
                 nav_html = admin_nav_html
-                page_html = publish_wishlist_page_html
-               
+                page_html = publish_waitlist_page_html
+
+              if base == 'testimonial':
+                page_id = 'publish_testimonial'
+                page_name = 'Publish Testimonial'
+                nav_html = admin_nav_html
+                page_html = publish_testimonial_page_html
+
       # - template
         objects = {
             'Site': app,
@@ -1616,6 +2258,18 @@ class publicSite(webapp2.RequestHandler):
         self.response.out.write(template.render(path, objects))
 
 #----------------------------------------------#
+#            Error Handling                    #
+#----------------------------------------------#
+def handle_404(request, response, exception):
+    logging.exception(exception)
+    response.write('A 404 error occurred!')
+    response.set_status(404)
+
+def handle_500(request, response, exception):
+    logging.exception(exception)
+    response.write('A 500 error occurred!')
+    response.set_status(500)
+#----------------------------------------------#
 #                                              #
 #----------------------------------------------#
 app = webapp2.WSGIApplication([    # - Pages
@@ -1628,36 +2282,51 @@ app = webapp2.WSGIApplication([    # - Pages
       ('/payment/?', publicSite),
       ('/charge_card/?', chargeCard),
       ('/payment_success', publicSite),
-      ('/my_program/?', publicSite),
       ('/cancel_program/?', cancelProgram),
       ('/cancel_program_success/?', publicSite),
 
-      ('/add2wishlist/?', publicSite),
+      ('/add2waitlist/?', publicSite),
+
+    ('/my_program/?', publicSite),
+    ('/my_info/?', publicSite),
+    ('/my_testimonial/?', publicSite),
+    ('/edit_my_info/?', publicSite),
+    ('/add_my_info/?', addClient_db_user),
+    ('/publish_my_testimonial/?', publicSite),
+    ('/edit_my_testimonial/?', publicSite),
 
     ('/results/?', publicSite),
     ('/exercises/?', publicSite),
     ('/exercise_detail/?', publicSite),
     ('/about/?', publicSite),
 
+    ('/contact/?', publicSite),
+    ('/submit_question/?', submitQuestion),
+    ('/contact_success/?', publicSite),
+
     ('/manage/?', publicSite),
     ('/manage/exercise/?', publicSite),
     ('/manage/client/?', publicSite),
-    ('/manage/wishlist/?', publicSite),
+    ('/manage/waitlist/?', publicSite),
+    ('/manage/testimonial/?', publicSite),
 
     ('/edit/?', publicSite),
     ('/edit/exercise/?', publicSite),
     ('/edit/client/?', publicSite),
-    ('/edit/wishlist/?', publicSite),
+    ('/edit/waitlist/?', publicSite),
+    ('/edit/testimonial/?', publicSite),
 
     ('/publish/exercise/?', publicSite),
     ('/publish/exercise_video?', publicSite),
     ('/publish/client/?', publicSite),
-    ('/publish/wishlist/?', publicSite),
+    ('/publish/waitlist/?', publicSite),
+    ('/publish/testimonial/?', publicSite),
 
     ('/manage/add_exercise/?', addExercise_db),
     ('/upload_exercise_video/?', UploadExerciseVideo),
     ('/manage/add_client/?', addClient_db),
-    ('/add_wishlist/?', addWishlist_db),
+    ('/manage/add_waitlist/?', addWaitlist_db),
+    ('/manage/add_testimonial/?', addTestimonial_db),
 
     # ('/manage/add_client/?', addClient_db),
     ('/list_data/?', listData),
@@ -1666,4 +2335,5 @@ app = webapp2.WSGIApplication([    # - Pages
     ('/view_video/([^/]+)?', ViewVideo),
 
 ], debug=True)
-
+# app.error_handlers[404] = handle_404
+# app.error_handlers[500] = handle_500

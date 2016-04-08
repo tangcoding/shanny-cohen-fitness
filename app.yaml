@@ -21,3 +21,4 @@ handlers:
 
 - url: /.*
   script: shanny-cohen-fitness.app
+  secure: always
