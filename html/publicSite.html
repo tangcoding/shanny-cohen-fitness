@@ -42,7 +42,7 @@
   .main_wrap img { width: 95%; }
 
   header.hi { margin: 25px; font-size: 32px; width: 385px; padding: 10px; border-bottom: 1px solid blue; color: #aaa; letter-spacing: .08em; padding-left: 25px; }
-
+  pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;  }
   </style>
 
 {{ analytics|safe }}
@@ -51,7 +51,7 @@
 <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 <script type="text/javascript">
   {%if page_id == 'payment'%}
-    Stripe.setPublishableKey('xxxxxxxx');
+    Stripe.setPublishableKey('xxxxx');
     jQuery(function($) {
       $('#payment-form').submit(function(event) {
         var $form = $(this);
@@ -199,7 +199,7 @@ demo.directive('testimonialView', function ($sce) {
   var directive = {};
   directive.restrict = 'E';
   // directive.scope = { data: '=' };
-  directive.template ='<b>[! item.client_name!]</b> on [!item.add_time | limitTo: 10 !]:<br> <p class="testimonial_text"><span>[! text_part1 !]</span><span ng-show="!full_text">[!dot!]</span><span class="show_btn" ng-show="!full_text" ng-click="show_more_click()">[!show_more!]</span><span ng-show="full_text">[! text_part2 !]</span><span class="show_btn" ng-show="full_text" ng-click="show_less_click()">[!show_less!]</span></p><img class="testimonial_thumb" ng-click="show_lg_img()" ng-show="full_text" ng-src="[!img_url!]" >';
+  directive.template ='<pre><b>[! item.client_name!]</b> on [!item.add_time | limitTo: 10 !]:<p class="testimonial_text"><span>[! text_part1 !]</span><span ng-show="!full_text">[!dot!]</span><span class="show_btn" ng-show="!full_text" ng-click="show_more_click()">[!show_more!]</span><span ng-show="full_text">[! text_part2 !]</span><span class="show_btn" ng-show="full_text" ng-click="show_less_click()">[!show_less!]</span></p></pre><img class="testimonial_thumb" ng-click="show_lg_img()" ng-show="full_text" ng-src="[!img_url!]" >';
   directive.link = function($scope) {
     $scope.cut_num = 225;
     $scope.full_text = false;
@@ -814,6 +814,21 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% endif %}
 {% endif %}
 
+{% if page_id == 'publish_exercise' %}
+  {% if admin == 'true' %}
+    $scope.if_any_selected = false;
+    $scope.toggle_selection = function(){
+      $scope.if_any_selected = false;
+      for(var i = 0; i < $scope.muscles.length; i++){
+        if($scope.muscles[i].selected){
+          $scope.if_any_selected = true;
+          break;
+        }      
+      }
+    };
+  {% endif %}
+{% endif %}
+
 {% if page_id == 'edit_exercise' %}
   {% if admin == 'true' %}
     $scope.data_id = "{{data_id}}";
@@ -827,6 +842,11 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
       $scope.equipment_type = data.equipment_type; 
       $scope.muscle_targeted = data.muscle_targeted.split(", ");
 
+      $scope.if_any_selected = false;
+      if($scope.muscle_targeted.length > 0){
+        $scope.if_any_selected = true;
+      }
+
       for(var j =0; j < $scope.muscles.length; j++){
         if( $scope.muscle_targeted.indexOf($scope.muscles[j].name) > -1 ){
           $scope.muscles[j].selected = true;
@@ -836,6 +856,17 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
         }
       }
     });
+
+
+    $scope.toggle_selection = function(){
+      $scope.if_any_selected = false;
+      for(var i = 0; i < $scope.muscles.length; i++){
+        if($scope.muscles[i].selected){
+          $scope.if_any_selected = true;
+          break;
+        }      
+      }
+    };
   {% endif %}
 {% endif %}
 
@@ -953,10 +984,7 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
 <body>
   <div class="user_gate" ng-show="huDisplay=='on'">
     {% if user_name != 'No User' %} 
-      <a href="/my_workout"><button>My Workout Plan</button></a>
-      <a href="/my_testimonial"><button>My Testimonials</button></a>
-      <a href="/my_program"><button>My Program</button></a>
-      <a href="/my_info"><button>My Info</button></a>
+      <a href="/my_account"><button>My Account</button></a>
     {% endif %}
     {% if admin == 'true' %}<a href="/manage">manage</a>&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}
       <a href="{{ login_key }}">{{ gate }}</a>

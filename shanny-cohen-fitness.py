@@ -383,11 +383,11 @@ publish_exercise_page_html = '''
       <form action="../../manage/add_exercise" enctype="multipart/form-data" method="post">
         <table>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="exercise_name" required/></td>
           </tr>
           <tr>
-            <td class="label">Equipment Type</td>
+            <td class="label">Equipment Type*</td>
             <td class="input">
               <select name="equipment_type" required>
                 <option ng-repeat="equipment in equipments" value="[!equipment.name!]">[!equipment.name!]</option>
@@ -395,10 +395,10 @@ publish_exercise_page_html = '''
             </td>
           </tr>
           <tr>
-            <td class="label">Muscle Targeted</td>
+            <td class="label">Muscle Targeted*</td>
             <td class="input">
               <label ng-repeat="muscle in muscles">
-                <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]"> [!muscle.name!]
+                <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]" ng-model="muscle.selected" ng-click="toggle_selection()" ng-required="!if_any_selected"> [!muscle.name!]
                 <br>
               </label>            
             </td>
@@ -434,11 +434,11 @@ edit_exercise_page_html = '''
             <td class="input"><input type="text" name="data_id" ng-model='data_id' required/></td>
           </tr>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="exercise_name" ng-model='exercise_name' required/></td>
           </tr>
           <tr>
-            <td class="label">Equipment Type</td>
+            <td class="label">Equipment Type*</td>
             <td class="input">
               <select name="equipment_type" ng-model='equipment_type' required>
                 <option ng-repeat="equipment in equipments" value="[!equipment.name!]">[!equipment.name!]</option>
@@ -446,10 +446,10 @@ edit_exercise_page_html = '''
             </td>
           </tr>
           <tr>
-            <td class="label">Muscle Targeted</td>
+            <td class="label">Muscle Targeted*</td>
             <td class="input">
               <label ng-repeat="muscle in muscles">
-                <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]" ng-model="muscle.selected"> [!muscle.name!]<br>
+                <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]" ng-model="muscle.selected" ng-click="toggle_selection()" ng-required="!if_any_selected"> [!muscle.name!]<br>
               </label>            
             </td>
           </tr>
@@ -735,7 +735,7 @@ results_page_html = '''
     .show_btn{color: steelblue;}
     .testimonial_thumb{max-width:100px;}
     .modal-backdrop{position: fixed; top: 0; left: 0; bottom: 0; right: 0;  z-index: 150;  background:rgba(0,0,0, 0.6);}
-    .modal{position: absolute; top:25px; z-index: 200; text-align: center; margin: auto auto;}
+    .modal{position: absolute; top:25px; z-index: 200; text-align: center; margin: auto auto; max-height:90%; max-width:90%;}
     #lg_img{max-height: 90%; max-width: 90%; margin: auto auto;}
     </style>
   <div class="main_wrap">
@@ -759,7 +759,7 @@ manage_testimonial_page_html = '''
     .show_btn{color: steelblue;}
     .testimonial_thumb{max-width:100px;}
     .modal-backdrop{position: fixed; top: 0; left: 0; bottom: 0; right: 0;  z-index: 150;  background:rgba(0,0,0, 0.6);}
-    .modal{position: absolute; top:25px; z-index: 200; text-align: center; margin: auto auto;}
+    .modal{position: absolute; top:25px; z-index: 200; text-align: center; margin: auto auto;max-height:90%; max-width:90%;}
     #lg_img{max-height: 600px; max-width: 800px; margin: auto auto;}
   </style>
   <div class="main_wrap">
@@ -798,11 +798,11 @@ edit_testimonial_page_html = '''
             <td class="input"><input type="text" name="data_id" ng-model='data_id' required/></td>
           </tr>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="client_name" ng-model="item.client_name" required/></td>
           </tr>
           <tr>
-            <td class="label">Comment</td>
+            <td class="label">Comment*</td>
             <td class="input"><textarea rows="20" cols="32" name="testimonial_text"  ng-model="item.testimonial_text" required></textarea></td>
           </tr>
           <tr>
@@ -840,11 +840,11 @@ publish_testimonial_page_html = '''
         <table>
         <table>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="client_name" required/></td>
           </tr>
           <tr>
-            <td class="label">Comment</td>
+            <td class="label">Comment*</td>
             <td class="input"><textarea rows="20" cols="32" name="testimonial_text" required></textarea></td>
           </tr>
           <tr>
@@ -854,7 +854,7 @@ publish_testimonial_page_html = '''
           <tr>
             <td></td>
             <td style="text-align:right">
-              <a href="/manage/waitlist"><button type="button">Cancel</button></a>
+              <a href="/manage/testimonial"><button type="button">Cancel</button></a>
               <input type="submit" value="Save" />
             </td>
           </tr>
@@ -866,6 +866,14 @@ publish_testimonial_page_html = '''
 #----------------------------------------------#
 #             Client Interface                 #
 #----------------------------------------------#
+my_account_page_html = '''
+  <div class="main_wrap">
+    <p><a href="/my_account/my_workout">My Workout Plan</a></p>
+    <p><a href="/my_account/my_testimonial">My Testimonials</a></p>
+    <p><a href="/my_account/my_program">My Program</a></p>
+    <p><a href="/my_account/my_info">My Info</a></p>
+  </div><!-- .main_wrap -->
+'''
 my_program_page_html = '''
   <div class="main_wrap">
     <div>
@@ -901,7 +909,7 @@ my_info_page_html = '''
       </div><!--.img_wrap-->
 
       <br>
-      <a ng-href='/edit_my_info'><button ng-disabled="btn_disable">Edit Info</button></a>
+      <a ng-href='/my_account/edit_my_info'><button ng-disabled="btn_disable">Edit Info</button></a>
     </div><!--.client_data-->
   </div><!-- .main_wrap -->
 '''
@@ -916,7 +924,7 @@ edit_my_info_page_html = '''
   <div class="main_wrap">
    <header class="hi"><span class="color_b">Edit Client [!item.client_email!]</span></header>
     <article class="form_wrap">
-      <form action="/add_my_info" enctype="multipart/form-data" method="post">
+      <form action="/my_account/add_my_info" enctype="multipart/form-data" method="post">
         <table>
           <tr class="hide">
             <td class="label">Email</td>
@@ -945,7 +953,7 @@ edit_my_info_page_html = '''
           <tr>
             <td></td>
             <td style="text-align:right">
-              <a href="/manage/client"><button type="button">Cancel</button></a>
+              <a href="/my_account/my_info"><button type="button">Cancel</button></a>
               <input type="submit" value="Save" />
             </td>
           </tr>
@@ -964,7 +972,7 @@ my_testimonial_page_html = '''
     #lg_img{max-height: 600px; max-width: 800px; margin: auto auto;}
     </style>
   <div class="main_wrap">
-    <a href='/publish_my_testimonial'><button>Add A New Testimonial</button></a>
+    <a href='/my_account/publish_my_testimonial'><button>Add A New Testimonial</button></a>
     <hr>
 
     <div class="modal-backdrop" ng-show="modal_show"></div>
@@ -976,7 +984,7 @@ my_testimonial_page_html = '''
     <div class="testimonial_wrap" ng-repeat="item in testimonial_data">
       <testimonial-view data="item"></testimonial-view>
       <br>
-      <a ng-href='/edit_my_testimonial/?data_id=[!item.data_id!]'><button>Edit Info</button></a>
+      <a ng-href='/my_account/edit_my_testimonial?[!item.data_id!]'><button>Edit Info</button></a>
       <button ng-click="delete(item.data_id)">Remove</button>
     </div><!-- .testimonial_wrap -->
   </div><!-- . main_wrap - -->
@@ -998,11 +1006,11 @@ edit_my_testimonial_page_html = '''
             <td class="input"><input type="text" name="data_id" ng-model='data_id' required/></td>
           </tr>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="client_name" ng-model="item.client_name" required/></td>
           </tr>
           <tr>
-            <td class="label">Comment</td>
+            <td class="label">Comment*</td>
             <td class="input"><textarea rows="20" cols="32" name="testimonial_text"  ng-model="item.testimonial_text" required></textarea></td>
           </tr>
           <tr>
@@ -1017,7 +1025,7 @@ edit_my_testimonial_page_html = '''
           <tr>
             <td></td>
             <td style="text-align:right">
-              <a href="/manage/testimonial"><button type="button">Cancel</button></a>
+              <a href="/my_account/my_testimonial"><button type="button">Cancel</button></a>
               <input type="submit" value="Save" />
             </td>
           </tr>
@@ -1039,11 +1047,11 @@ publish_my_testimonial_page_html = '''
       <form action="/manage/add_testimonial" enctype="multipart/form-data"  method="post">
         <table>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="client_name" required/></td>
           </tr>
           <tr>
-            <td class="label">Comment</td>
+            <td class="label">Comment*</td>
             <td class="input"><textarea rows="20" cols="32" name="testimonial_text" required></textarea></td>
           </tr>
           <tr>
@@ -1053,7 +1061,7 @@ publish_my_testimonial_page_html = '''
           <tr>
             <td></td>
             <td style="text-align:right">
-              <a href="/manage/waitlist"><button type="button">Cancel</button></a>
+              <a href="/my_account/my_testimonial"><button type="button">Cancel</button></a>
               <input type="submit" value="Save" />
             </td>
           </tr>
@@ -1066,10 +1074,9 @@ my_workout_page_html='''
   <style type="text/css">
     .main_wrap a{text-decoration:underline;}
     .outter_wrap{width: 100%; overflow-x:scroll;}
-    .workout_plan{width: 1200px;  overflow-x: scroll; table-layout: fixed; }
-    .workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 120px;}
-    .workout_plan td{padding: 5px; min-width: 120px;}
-    pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;  }
+    .workout_plan{width: 1200px; table-layout: fixed; }
+    .workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px;}
+    .workout_plan td{padding: 5px; min-width: 100px;}
     .White, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid grey; padding: 10px 10px; margin: 5px auto;}
     .White{background:#fff;}
     .LightBlue{background:#81D4FA;}
@@ -1167,24 +1174,24 @@ edit_client_page_html = '''
         <table>
           <tr class="hide">
             <td class="label">Email</td>
-            <td class="input"><input type="text" name="client_email" ng-model='item.client_email' required/></td>
+            <td class="input"><input type="email" name="client_email" ng-model='item.client_email' required/></td>
           </tr>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="client_name" ng-model='item.client_name' required/></td>
           </tr>
           <tr>
-            <td class="label">Client Program</td>
+            <td class="label">Client Program*</td>
             <td class="input">
-              <select ng-model='item.client_program' name="client_program">
+              <select ng-model='item.client_program' name="client_program" required>
                 <option ng-repeat="program in programs" value="[!program.name!]">[!program.name!]</option>
               </select>
             </td>
           </tr>
           <tr>
-            <td class="label">Program Status</td>
+            <td class="label">Program Status*</td>
             <td class="input">
-              <select ng-model='item.program_status' name="program_status">
+              <select ng-model='item.program_status' name="program_status" required>
                 <option ng-repeat="status in program_status_list" value="[!status!]">[!status!]</option>
               </select>
             </td>
@@ -1230,25 +1237,25 @@ publish_client_page_html = '''
       <form action="../../manage/add_client" enctype="multipart/form-data" method="post">
         <table>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="client_name" ng-model='client_name' required/></td>
           </tr>
           <tr>
-            <td class="label">Email</td>
-            <td class="input"><input type="text" name="client_email" ng-model='client_email' required/></td>
+            <td class="label">Email*</td>
+            <td class="input"><input type="email" name="client_email" ng-model='client_email' required/></td>
           </tr>
           <tr>
-            <td class="label">Client Program</td>
+            <td class="label">Client Program*</td>
             <td class="input">
-              <select name="client_program">
+              <select name="client_program" required>
                 <option ng-repeat="program in programs" value="[!program.name!]">[!program.name!]</option>
               </select>
             </td>
           </tr>
           <tr>
-            <td class="label">Program Status</td>
+            <td class="label">Program Status*</td>
             <td class="input">
-              <select name="program_status">
+              <select name="program_status" required>
                 <option ng-repeat="status in program_status_list" value="[!status!]">[!status!]</option>
               </select>
             </td>
@@ -1293,7 +1300,7 @@ manage_waitlist_page_html = '''
       <input ng-model='select_client' type="text">
     </div>
 
-    <div class="client_data" ng-repeat="item in waitlist_data | orderBy: 'client_id' | filter:select_client">
+    <div class="client_data" ng-repeat="item in waitlist_data | orderBy: 'add_time' | filter:select_client">
         <p> Add Time:  [! item.add_time | limitTo: 19 !] </p>
         <p> Client Name:  [! item.client_name !] </p>  
         <p> Client Email:  [! item.client_email !] </p> 
@@ -1318,20 +1325,20 @@ edit_waitlist_page_html = '''
       <form action="/manage/add_waitlist" method="post">
         <table>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="client_name" ng-model="item.client_name" required/></td>
           </tr>
           <tr>
-            <td class="label">Program</td>
+            <td class="label">Program*</td>
             <td class="input">
-              <select name="client_program" ng-model="item.client_program">
+              <select name="client_program" ng-model="item.client_program" required>
                 <option ng-repeat="program in programs" value="[!program.name!]">[!program.name!]</option>
               </select>
             </td>
           </tr>
           <tr>
-            <td class="label">Email</td>
-            <td class="input"><input type="text" name="client_email" ng-model="item.client_email" required/></td>
+            <td class="label">Email*</td>
+            <td class="input"><input type="email" name="client_email" ng-model="item.client_email" required/></td>
           </tr>
           <tr>
             <td class="label">Client Phone</td>
@@ -1366,20 +1373,20 @@ publish_waitlist_page_html = '''
       <form action="/manage/add_waitlist" method="post">
         <table>
           <tr>
-            <td class="label">Name</td>
+            <td class="label">Name*</td>
             <td class="input"><input type="text" name="client_name" required/></td>
           </tr>
           <tr>
-            <td class="label">Program</td>
+            <td class="label">Program*</td>
             <td class="input">
-              <select name="client_program">
+              <select name="client_program" required>
                 <option ng-repeat="program in programs" value="[!program.name!]">[!program.name!]</option>
               </select>
             </td>
           </tr>
           <tr>
-            <td class="label">Email</td>
-            <td class="input"><input type="text" name="client_email" required/></td>
+            <td class="label">Email*</td>
+            <td class="input"><input type="email" name="client_email" required/></td>
           </tr>
           <tr>
             <td class="label">Client Phone</td>
@@ -1408,10 +1415,9 @@ mange_workout_page_html = '''
   <style type="text/css">
     .main_wrap a{text-decoration:underline;}
     .outter_wrap{width: 100%; overflow-x:scroll;}
-    .workout_plan{width: 1200px;  overflow-x: scroll; table-layout: fixed; }
-    .workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 120px;}
-    .workout_plan td{padding: 5px; min-width: 120px;}
-    pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;  }
+    .workout_plan{width: 1200px; table-layout: fixed; }
+    .workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px;}
+    .workout_plan td{padding: 5px; min-width: 100px;}
     .White, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid grey; padding: 10px 10px; margin: 5px auto;}
     .White{background:#fff;}
     .LightBlue{background:#81D4FA;}
@@ -1467,10 +1473,9 @@ edit_workout_page_html = '''
   .modal-backdrop{position: fixed; top: 0; left: 0; bottom: 0; right: 0;  z-index: 100;  background:rgba(0,0,0, 0.6);}
   .main_wrap a{text-decoration:underline;}
   .outter_wrap{width: 100%; overflow-x:scroll;}
-  .workout_plan{width: 1200px;  overflow-x: scroll; table-layout: fixed; }
-  .workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 120px;}
-  .workout_plan td{padding: 5px; min-width: 120px;}
-  pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;  }
+  .workout_plan{width: 1200px; table-layout: fixed; }
+  .workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px;}
+  .workout_plan td{padding: 5px; min-width: 100px;}
   .White, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid grey; padding: 10px 10px; margin: 5px auto;}
   .White{background:#fff;}
   .LightBlue{background:#81D4FA;}
@@ -1842,7 +1847,7 @@ class addClient_db_user(webapp2.RequestHandler):
           item.has_photo = False
       #
       item.put()
-      self.redirect('/my_info')
+      self.redirect('/my_account/my_info')
 
 class Waitlist_db(ndb.Model):
     add_time = ndb.StringProperty()
@@ -1912,7 +1917,7 @@ class chargeCard(webapp2.RequestHandler):
   def post(self):
 
     #- stripe key and plan
-    stripe.api_key = "xxxxxxxx"
+    stripe.api_key = "xxxxx"
 
     # stripe.Plan.create(
     #   amount=55000,
@@ -1994,7 +1999,7 @@ class cancelProgram(webapp2.RequestHandler):
   def get(self):
 
     #- stripe key 
-    stripe.api_key = "xxxxxxxx"
+    stripe.api_key = "xxxxx"
 
     if users.get_current_user():
       client_email = users.get_current_user().email()
@@ -2022,7 +2027,7 @@ class cancelProgram(webapp2.RequestHandler):
 
 def cancelProgram_admin(client_email):
     #- stripe key 
-    stripe.api_key = "xxxxxxxx"
+    stripe.api_key = "xxxxx"
 
     item = Client_db.get_by_id(client_email)
     if item.program_status == 'Active' and item.stripe_cus_id and item.stripe_subscription_id:
@@ -2124,7 +2129,7 @@ class addTestimonial_db(webapp2.RequestHandler):
         if users.is_current_user_admin():
           self.redirect('/manage/testimonial')
         else:
-          self.redirect('/my_testimonial')
+          self.redirect('/my_account/my_testimonial')
 
 #----------------------------------------------#
 #           Exercise Data Stucture             #
@@ -2485,7 +2490,7 @@ class publicSite(webapp2.RequestHandler):
             page_class = 'manage'
 
         # - some other pages for public 
-        if path_layer == 'payment' or path_layer == 'add2waitlist' or path_layer == 'my_program' or path_layer == 'my_info' or path_layer == 'edit_my_info' or path_layer == 'my_testimonial' or path_layer == 'publish_my_testimonial' or path_layer == 'edit_my_testimonial':
+        if path_layer == 'payment' or path_layer == 'add2waitlist' or path_layer == 'my_account' :
           page_id = 'login_page'
           page_name = 'Log in'
           page_html = page_header + login_page_html
@@ -2503,41 +2508,49 @@ class publicSite(webapp2.RequestHandler):
               page_html = page_header + add2waitlist_page_html
               program_chosen = self.request.get('program_chosen')
 
-          if path_layer == 'my_program':
-              page_id = 'my_program'
-              page_name = 'My Program'
-              page_html = page_header + my_program_page_html
+          if path_layer == 'my_account':
+            print "layer"
+            print base
+            if base == 'my_account' or base == '':
+              page_id = 'my_account'
+              page_name = 'My Account'
+              page_html = page_header + my_account_page_html
 
-          if path_layer == 'my_info':
-              page_id = 'my_info'
-              page_name = 'My Info'
-              page_html = page_header + my_info_page_html
+            if base == 'my_program':
+                page_id = 'my_program'
+                page_name = 'My Program'
+                page_html = page_header + my_program_page_html
 
-          if path_layer == 'edit_my_info':
-              page_id = 'edit_my_info'
-              page_name = 'Edit My Info'
-              page_html = page_header + edit_my_info_page_html
+            if base == 'my_info':
+                page_id = 'my_info'
+                page_name = 'My Info'
+                page_html = page_header + my_info_page_html
 
-          if path_layer == 'my_testimonial':
-              page_id = 'my_testimonial'
-              page_name = 'My Testimonial'
-              page_html = page_header + my_testimonial_page_html
+            if base == 'edit_my_info':
+                page_id = 'edit_my_info'
+                page_name = 'Edit My Info'
+                page_html = page_header + edit_my_info_page_html
 
-          if path_layer == 'my_workout':
-              page_id = 'my_workout'
-              page_name = 'My Workout'
-              page_html = page_header + my_workout_page_html
+            if base == 'my_testimonial':
+                page_id = 'my_testimonial'
+                page_name = 'My Testimonial'
+                page_html = page_header + my_testimonial_page_html
 
-          if path_layer == 'publish_my_testimonial':
-              page_id = 'publish_my_testimonial'
-              page_name = 'Publish My Testimonial'
-              page_html = page_header + publish_my_testimonial_page_html
+            if base == 'my_workout':
+                page_id = 'my_workout'
+                page_name = 'My Workout'
+                page_html = page_header + my_workout_page_html
 
-          if path_layer == 'edit_my_testimonial':
-              page_id = 'edit_my_testimonial'
-              page_name = 'Edit My Testimonial'
-              page_html = page_header + edit_my_testimonial_page_html
-              data_id = self.request.get('data_id')
+            if base == 'publish_my_testimonial':
+                page_id = 'publish_my_testimonial'
+                page_name = 'Publish My Testimonial'
+                page_html = page_header + publish_my_testimonial_page_html
+
+            if base.startswith('edit_my_testimonial'):
+                page_id = 'edit_my_testimonial'
+                page_name = 'Edit My Testimonial'
+                page_html = page_header + edit_my_testimonial_page_html
+                data_id = base.split('?')[1]
 
         # - manage, edit, publish pages for admin
         if admin == 'true':
@@ -2707,14 +2720,15 @@ app = webapp2.WSGIApplication([    # - Pages
 
       ('/add2waitlist/?', publicSite),
 
-    ('/my_program/?', publicSite),
-    ('/my_info/?', publicSite),
-    ('/my_testimonial/?', publicSite),
-    ('/my_workout/?', publicSite),
-    ('/edit_my_info/?', publicSite),
-    ('/add_my_info/?', addClient_db_user),
-    ('/publish_my_testimonial/?', publicSite),
-    ('/edit_my_testimonial/?', publicSite),
+    ('/my_account/?', publicSite),
+    ('/my_account/my_program/?', publicSite),
+    ('/my_account/my_info/?', publicSite),
+    ('/my_account/my_testimonial/?', publicSite),
+    ('/my_account/my_workout/?', publicSite),
+    ('/my_account/edit_my_info/?', publicSite),
+    ('/my_account/add_my_info/?', addClient_db_user),
+    ('/my_account/publish_my_testimonial/?', publicSite),
+    ('/my_account/edit_my_testimonial/?', publicSite),
 
     ('/results/?', publicSite),
     ('/exercises/?', publicSite),
