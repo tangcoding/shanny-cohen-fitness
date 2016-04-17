@@ -3,7 +3,8 @@
 
 Site = 'Shanny Cohen Fitness'
 
-Timezone = 'Pacific/Honolulu'
+# Timezone = 'Pacific/Honolulu'
+Timezone = 'US/Pacific'
 
 Colors = '''
     base03:    #002b36;
@@ -57,12 +58,12 @@ public_nav_html = '''
       <a href="../../results"><li id="resultsNav">Results</li></a>
       <a href="../../exercises"><li id="exercisesNav">Exercises</li></a>
       <a href="../../about"><li id="aboutNav">About</li></a>
+      <a href="/contact"><li id="contactNav">Contact</li></a>
     </ul>
     <div class="social_wrap">
       <a href="https://www.instagram.com/shannycohen_fitness/" target="_blank"><i class="fa fa-instagram"></i></a>
       <a href="https://twitter.com/shannycohen_fit" target="_blank"><i class="fa fa-twitter-square"></i></a>
       <a href="https://www.facebook.com/ShannyCohenAthletePage/timeline" target="_blank"><i class="fa fa-facebook-official"></i></a>
-      <a href="/contact"><i class="fa fa-question-circle"></i></a>
     </div><!-- . social_wrap - -->
     </nav><!-- - /main_nav - -->
 '''
@@ -194,7 +195,11 @@ contact_page_html = '''
             <td class="input"><input type="email" name="client_email" required/></td>
           </tr>
           <tr>
-            <td class="label">Question</td>
+            <td class="label">Address</td>
+            <td class="input"><textarea name="client_address" rows="5" cols="20" ></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Question*</td>
             <td class="input"><textarea name="client_question" rows="20" cols="30" required></textarea></td>
           </tr>
           <tr>
@@ -230,7 +235,7 @@ exercises_page_html = '''
 
     <div id="initial_category_wrap" ng-click="display_exercises()">
       <label ng-repeat="muscle in muscles">
-        <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]" ng-model="muscle.selected" ng-click="toggle_selection(muscle.name)" class="hide"> [!muscle.name!]<br>        
+        <input type="checkbox" value="[!muscle.name!]" ng-model="muscle.selected" ng-click="toggle_muscle_selection(muscle.name)" class="hide"> [!muscle.name!]<br>        
       </label>        
       <label>
         <input type="checkbox" name="select_all" value="select_all" ng-click="select_all_exercises()" class="hide"> All Exercises<br>        
@@ -248,16 +253,29 @@ exercises_page_html = '''
         </from>
 
         <hr>
+        <p><b>Muscle Targeted</b></p>
         <label>
-          <input type="checkbox" name="select_all" value="all" ng-click="select_all_exercises()" class="hide"> Select All<br>        
+          <input type="checkbox" name="select_all" value="all" ng-click="select_all_muscles()" class="hide"> Select All<br>        
         </label> 
         <label>
-          <input type="checkbox" name="deselect_all" value="deselect_all" ng-click="deselect_all_exercises()" class="hide"> Deselect All<br>        
-        </label> 
-        <hr>  
+          <input type="checkbox" name="deselect_all" value="deselect_all" ng-click="deselect_all_muscles()" class="hide"> Deselect All<br>        
+        </label>  
         <label ng-repeat="muscle in muscles">
-          <input type="checkbox" name="muscle_targeted" value="[!muscle.name!]" ng-model="muscle.selected" ng-click="toggle_selection(muscle.name)"> [!muscle.name!]<br>   
-        </label>            
+          <input type="checkbox" value="[!muscle.name!]" ng-model="muscle.selected" ng-click="toggle_muscle_selection(muscle.name)"> [!muscle.name!]<br>   
+        </label> 
+
+        <hr>
+        <p><b>Equipment Type</b></p> 
+        <label>
+          <input type="checkbox" name="select_all" value="all" ng-click="select_all_equipments()" class="hide"> Select All<br>        
+        </label> 
+        <label>
+          <input type="checkbox" name="deselect_all" value="deselect_all" ng-click="deselect_all_equipments()" class="hide"> Deselect All<br>        
+        </label>  
+        <label ng-repeat="equipment in equipments">
+          <input type="checkbox" value="[!equipment.name!]" ng-model="equipment.selected" ng-click="toggle_equipment_selection(equipment.name)"> [!equipment.name!]<br>   
+        </label>   
+      
       </div><!--.select_category_wrap-->
 
       <div class="select_data_wrap">
@@ -270,9 +288,9 @@ exercises_page_html = '''
           </div><!--.img_wrap-->
 
           <div class="text_wrap">
-            <p> Exercise Name:<br>[! item.exercise_name !] </p>  
-            <p> Equipment Type:<br>  [! item.equipment_type !] </p> 
-            <p> Muscle Targeted:<br>  [! item.muscle_targeted !] </p> 
+            <p> Exercise Name: [! item.exercise_name !] </p>  
+            <p> Equipment Type: [! item.equipment_type !] </p> 
+            <p> Muscle Targeted: [! item.muscle_targeted !] </p> 
           </div><!--.text_wrap-->
           </a>
         </div><!--.exercise_data-->
@@ -290,8 +308,8 @@ exercise_detail_page_html = '''
     .img_wrap{width: 100%; max-height: 400px; margin: 25 auto;}
   </style>
   <div class="main_wrap">
-    <div class="video_wrap" >
-      <video id="video" ng-show='item.exercise_video_key' width="300" height="200" ng-src="[!video_url!]"></video>
+    <div class="video_wrap" ng-show='item.exercise_video_key'>
+      <video id="video" width="300" height="200" ng-src="[!video_url!]"></video>
 
       <div id="video_controls">
         <button type="button" id="play-pause"><i class="fa fa-play"></i></button>
@@ -370,7 +388,11 @@ publish_exercise_page_html = '''
           </tr>
           <tr>
             <td class="label">Equipment Type</td>
-            <td class="input"><input type="text" name="equipment_type" /></td>
+            <td class="input">
+              <select name="equipment_type" required>
+                <option ng-repeat="equipment in equipments" value="[!equipment.name!]">[!equipment.name!]</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td class="label">Muscle Targeted</td>
@@ -417,7 +439,11 @@ edit_exercise_page_html = '''
           </tr>
           <tr>
             <td class="label">Equipment Type</td>
-            <td class="input"><input type="text" name="equipment_type" ng-model='equipment_type' /></td>
+            <td class="input">
+              <select name="equipment_type" ng-model='equipment_type' required>
+                <option ng-repeat="equipment in equipments" value="[!equipment.name!]">[!equipment.name!]</option>
+              </select>
+            </td>
           </tr>
           <tr>
             <td class="label">Muscle Targeted</td>
@@ -473,6 +499,8 @@ publish_exercise_video_page_html = '''
 #----------------------------------------------#
 #    Programs Signup and Payment               #
 #----------------------------------------------#
+silver_brozen_coupon_limit =10
+
 programs_page_html = '''
   <style>
   body { background: url("pics/programs.jpg") no-repeat center center fixed; background-size: cover;}
@@ -489,17 +517,8 @@ programs_page_html = '''
 
   
   <div class="main_wrap">
-  <h2 class="programs_title">Programs</h2>
   <h3 class="programs_title" style='color:red'>Test Mode, Not use this page to Sign up now. <br> Instead, please email shannycohen.fitness@gmail.com</h3>
-  <!--
-  <ul>
-    <li>Strength and Conditioning</li>
-    <li>Weight Loss</li>
-    <li>Sport Specific Training</li>
-    <li>Post-Injury Exercise Rehab</li>
-    <li>Orthopedic Condition Specific Training</li>
-  </ul>
-  -->
+  <h2 class="programs_title">Personalized Packages</h2>
 
   <div class="package_list">
       <div class="package_wrap">
@@ -540,6 +559,8 @@ programs_page_html = '''
           <button class="sign_up_btn" ng-disabled='gold_avail' ng-click=" add2waitlist('Gold') ">Add to Waitlist</button>
         </div>
       </div><!-- . package_wrap - -->
+
+      <h2 class="programs_title">Memberships</h2>
       <div class="package_wrap">
         <div class="package_data">
           <h2 class="package_title"><b>Silver</b></h2>
@@ -631,7 +652,7 @@ payment_page_html = '''
   .form_title{background: #0D47A1; padding: 10px; color:#fff;}
   .payment-errors{color:red;}
   .stripe_img{margin: 25px auto;}
-  button[type='submit']{border-radius:0; border: none; background: #0D47A1; color:#fff; padding: 5px; font-size: 12px;}
+  button[type='submit']{border-radius:0; padding: 5px; font-size: 12px;}
   </style>
   <div class="main_wrap">
   <article class="form_wrap">
@@ -715,7 +736,7 @@ results_page_html = '''
     .testimonial_thumb{max-width:100px;}
     .modal-backdrop{position: fixed; top: 0; left: 0; bottom: 0; right: 0;  z-index: 150;  background:rgba(0,0,0, 0.6);}
     .modal{position: absolute; top:25px; z-index: 200; text-align: center; margin: auto auto;}
-    #lg_img{max-height: 600px; max-width: 800px; margin: auto auto;}
+    #lg_img{max-height: 90%; max-width: 90%; margin: auto auto;}
     </style>
   <div class="main_wrap">
     Results and Testimonials
@@ -1041,6 +1062,54 @@ publish_my_testimonial_page_html = '''
     </article><!-- - /form_wrap - -->
   </div><!-- - .main_wrap - --> 
 '''
+my_workout_page_html='''
+  <style type="text/css">
+    .main_wrap a{text-decoration:underline;}
+    .outter_wrap{width: 100%; overflow-x:scroll;}
+    .workout_plan{width: 1200px;  overflow-x: scroll; table-layout: fixed; }
+    .workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 120px;}
+    .workout_plan td{padding: 5px; min-width: 120px;}
+    pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;  }
+    .White, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid grey; padding: 10px 10px; margin: 5px auto;}
+    .White{background:#fff;}
+    .LightBlue{background:#81D4FA;}
+    .LightGreen{background:#B2DFDB;}
+    .LightGrey{background:#E0E0E0;}
+    .BlueGrey{background:#B0BEC5;}
+  </style>
+  <div class="main_wrap">
+        <p>[!item.program_date!]&nbsp;&nbsp;[!item.muscles!]&nbsp;&nbsp;[!item.client_name!]</p>
+        <p>[!item.general_explanation!]</p>
+
+        <div class="outter_wrap">
+        <table class="workout_plan">
+
+        <tr>
+          <th>Exercise</th>
+          <th>Warm up sets</th>
+          <th>Set 1</th>
+          <th>Set 2</th>
+          <th>Set 3</th>
+          <th ng-show="table_length>=4">Set 4</th>
+          <th ng-show="table_length>=5">Set 5</th>
+          <th>Image</th>
+        </tr>
+
+        <tr ng-repeat="exercise in item.workout" ng-class="exercise.exercise_color">
+              <td><a href="/exercise_detail/?data_id=[!exercise.exercise_id!]" target="_blank">[!exercise.name!]</a><br>[!exercise.notes!]</td>
+              <td><pre>[!exercise.warmup_set!]</pre></td>
+              <td><pre>[!exercise.set1!]</pre></td>
+              <td><pre>[!exercise.set2!]</pre></td>
+              <td><pre>[!exercise.set3!]</pre></td>
+              <td ng-show="table_length>=4"><pre>[!exercise.set4!]</pre></td>
+              <td ng-show="table_length>=5"><pre>[!exercise.set5!]</pre></td>
+              <td><img ng-src="/render_img?exercise?thumb?[!exercise.exercise_id!]"></td>
+        </tr><!-- .exercise_list -->
+        </table>
+        </div><!-- .outter_wrap -->
+
+  </div><!-- .main_wrap -->
+'''
 #----------------------------------------------#
 #             Client Publish Manage            #
 #----------------------------------------------#
@@ -1054,7 +1123,12 @@ manage_client_page_html = '''
   <div class="main_wrap">
     <a href='/publish/client'><button>Add A New Client</button></a>
     <hr>
-    <div class="client_data" ng-repeat="item in client_data" | orderBy: 'client_email'>
+    <div class="input-group">
+      <span>Seach:</span>
+      <input ng-model='select_client' type="text">
+    </div>
+
+    <div class="client_data" ng-repeat="item in client_data  | orderBy: 'client_email' | filter:select_client " >
       <div class="text_wrap">
         <p> Add Time:  [! item.add_time | limitTo: 10 !] </p>
         <p> Client Name:  [! item.client_name !] </p>  
@@ -1073,6 +1147,7 @@ manage_client_page_html = '''
 
       <br>
       <a ng-href='/edit/client?[!item.client_email!]'><button ng-disabled="btn_disable">Edit Info</button></a>
+      <a ng-href='/manage/workout?[!item.client_email!]'><button ng-disabled="btn_disable">Manage Workouts</button></a>
       <button ng-click="delete(item.client_email)" ng-disabled="btn_disable">Remove</button>
     </div><!--.client_data-->
   </div><!-- .main_wrap -->
@@ -1179,14 +1254,6 @@ publish_client_page_html = '''
             </td>
           </tr>
           <tr>
-            <td class="label">Stripe_cus_id</td>
-            <td class="input"><input type="text" name="stripe_cus_id" ng-model='stripe_cus_id'/></td>
-          </tr>
-          <tr>
-            <td class="label">stripe_subscription_id</td>
-            <td class="input"><input type="text" name="stripe_subscription_id" ng-model='stripe_subscription_id' /></td>
-          </tr>
-          <tr>
             <td class="label">Phone</td>
             <td class="input"><input type="text" name="client_phone" ng-model='client_phone'/></td>
           </tr>
@@ -1221,7 +1288,12 @@ manage_waitlist_page_html = '''
   <div class="main_wrap">
     <a href='/publish/waitlist'><button>Add A New Client to Waitlist</button></a>
     <hr>
-    <div class="client_data" ng-repeat="item in waitlist_data" | orderBy: 'client_id'>
+    <div class="input-group">
+      <span>Seach:</span>
+      <input ng-model='select_client' type="text">
+    </div>
+
+    <div class="client_data" ng-repeat="item in waitlist_data | orderBy: 'client_id' | filter:select_client">
         <p> Add Time:  [! item.add_time | limitTo: 19 !] </p>
         <p> Client Name:  [! item.client_name !] </p>  
         <p> Client Email:  [! item.client_email !] </p> 
@@ -1280,7 +1352,7 @@ edit_waitlist_page_html = '''
       </form>
     </article><!-- - /form_wrap - -->
   </div><!-- - .main_wrap - -->
-'''
+''' 
 publish_waitlist_page_html = '''
   <style>
   .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 345px; padding: 45px; }
@@ -1330,6 +1402,221 @@ publish_waitlist_page_html = '''
   </div><!-- - .main_wrap - --> 
 '''
 #----------------------------------------------#
+#            Client Workouts Manage             #
+#----------------------------------------------#
+mange_workout_page_html = '''
+  <style type="text/css">
+    .main_wrap a{text-decoration:underline;}
+    .outter_wrap{width: 100%; overflow-x:scroll;}
+    .workout_plan{width: 1200px;  overflow-x: scroll; table-layout: fixed; }
+    .workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 120px;}
+    .workout_plan td{padding: 5px; min-width: 120px;}
+    pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;  }
+    .White, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid grey; padding: 10px 10px; margin: 5px auto;}
+    .White{background:#fff;}
+    .LightBlue{background:#81D4FA;}
+    .LightGreen{background:#B2DFDB;}
+    .LightGrey{background:#E0E0E0;}
+    .BlueGrey{background:#B0BEC5;}
+  </style>
+  <div class="main_wrap">
+    <header class="hi color_b">Exercise Plan for [!client_id!]</header>
+        <a ng-href='/edit/workout?[!client_id!]'><button>Edit Workouts</button></a>
+        <button ng-click="del_workout(client_id)">Remove Workouts</button>
+
+        <p>[!item.program_date!]&nbsp;&nbsp;[!item.muscles!]&nbsp;&nbsp;[!item.client_name!]</p>
+        <p>[!item.general_explanation!]</p>
+
+
+        <div class="outter_wrap">
+        <table class="workout_plan">
+
+        <tr>
+          <th>Exercise</th>
+          <th>2 Warm up sets</th>
+          <th>Set 1</th>
+          <th>Set 2</th>
+          <th>Set 3</th>
+          <th ng-show="table_length>=4">Set 4</th>
+          <th ng-show="table_length>=5">Set 5</th>
+          <th>Image</th>
+        </tr>
+
+        <tr ng-repeat="exercise in item.workout" ng-class="exercise.exercise_color">
+              <td><a href="/exercise_detail/?data_id=[!exercise.exercise_id!]" target="_blank">[!exercise.name!]</a><br>[!exercise.notes!]</td>
+              <td><pre>[!exercise.warmup_set!]</pre></td>
+              <td><pre>[!exercise.set1!]</pre></td>
+              <td><pre>[!exercise.set2!]</pre></td>
+              <td><pre>[!exercise.set3!]</pre></td>
+              <td ng-show="table_length>=4"><pre>[!exercise.set4!]</pre></td>
+              <td ng-show="table_length>=5"><pre>[!exercise.set5!]</pre></td>
+              <td><img ng-src="/render_img?exercise?thumb?[!exercise.exercise_id!]"></pre></td>
+        </tr><!-- .exercise_list -->
+        </table>
+        </div><!-- .outter_wrap -->
+
+  </div><!-- .main_wrap -->
+'''
+edit_workout_page_html = '''
+  <style>
+  .form_wrap { margin-left: 55px; margin-top: 35px; outline: 1px solid #eee; width: 600px; padding: 45px; }
+  tr { height: 32px; overflow-x:auto;}
+  td.label { font-size: 14px; text-align: right; padding-right: 10px; }
+  input[type="text"] { width: 200px; height: 16px; }
+  .modal{ position: absolute; top: 0; z-index: 200;  padding: 25px; background: #fff; text-align: center;}
+  .modal-backdrop{position: fixed; top: 0; left: 0; bottom: 0; right: 0;  z-index: 100;  background:rgba(0,0,0, 0.6);}
+  .main_wrap a{text-decoration:underline;}
+  .outter_wrap{width: 100%; overflow-x:scroll;}
+  .workout_plan{width: 1200px;  overflow-x: scroll; table-layout: fixed; }
+  .workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 120px;}
+  .workout_plan td{padding: 5px; min-width: 120px;}
+  pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;  }
+  .White, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid grey; padding: 10px 10px; margin: 5px auto;}
+  .White{background:#fff;}
+  .LightBlue{background:#81D4FA;}
+  .LightGreen{background:#B2DFDB;}
+  .LightGrey{background:#E0E0E0;}
+  .BlueGrey{background:#B0BEC5;}
+  .btn_wrap{margin: 25px auto;}
+  </style>
+
+  <div class="main_wrap">
+   <header class="hi"><span class="color_b">Edit Workouts for [!item.client_email!]</span></header>
+    <article class="form_wrap">
+        <table>
+          <tr class="hide">
+            <td class="label">Email</td>
+            <td class="input"><input type="text" name="client_email" ng-model='item.client_email' required/></td>
+          </tr>
+          <tr>
+            <td class="label">Date</td>
+            <td class="input"><input type="text" name="program_date" ng-model='item.program_date' placeholder="e.g. March 7-14" required/></td>
+          </tr>
+          <tr>
+            <td class="label">Client Name</td>
+            <td class="input"><input type="text" name="client_name" ng-model='item.client_name' required/></td>
+          </tr>
+          <tr>
+            <td class="label">Muscles</td>
+            <td class="input"><input type="text" name="muscles" ng-model='item.muscles' placeholder="e.g. Quads/Calves" required/></td>
+          </tr>
+          <tr>
+            <td class="label">General Explanation</td>
+            <td class="input"><textarea rows="3" cols="30" name="general_explanation" ng-model='item.general_explanation' placeholder="e.g. Super Sets with 90 second- 2 min Rest Between"> </textarea></td>
+          </tr>
+        </table>
+
+        <div class="outter_wrap">
+          <table class="workout_plan">
+
+          <tr>
+            <th>Exercise</th>
+            <th>2 Warm up sets</th>
+            <th>Set 1</th>
+            <th>Set 2</th>
+            <th>Set 3</th>
+            <th>Set 4</th>
+            <th>Set 5</th>
+            <th>Image</th>
+            <th>Delete</th>
+            <th>Edit</th>
+          </tr>
+
+          <tr ng-repeat="exercise in item.workout" ng-class="exercise.exercise_color">
+                <td>
+                  <a href="/exercise_detail/?data_id=[!exercise.exercise_id!]" target="_blank">[!exercise.name!]</a>
+                  <br>[!exercise.notes!]
+                </td>
+                <td><pre>[!exercise.warmup_set!]</pre></td>
+                <td><pre>[!exercise.set1!]</pre></td>
+                <td><pre>[!exercise.set2!]</pre></td>
+                <td><pre>[!exercise.set3!]</pre></td>
+                <td><pre>[!exercise.set4!]</pre></td>
+                <td><pre>[!exercise.set5!]</pre></td>
+                <td><img ng-src="/render_img?exercise?thumb?[!exercise.exercise_id!]"></td>
+                <td><button ng-click="del_workout($index)">X</button></td>
+                <td><button ng-click="edit_workout($index)">Edit</button></td>
+          </tr><!-- .exercise_list -->
+          </table>
+        </div><!-- .outter_wrap -->
+
+
+        <div class="btn_wrap">
+          <button type="button" ng-click="new_workout()">Add an Exercise</button>
+        </div><!-- - .btn_wrap - -->
+
+        <div class="btn_wrap">
+          <a href="/manage/workout?[!item.client_email!]"><button type="button">Cancel</button></a>
+          <button ng-click="save_workout_plan()">Save</button>
+        </div><!-- - .btn_wrap - -->
+    </article><!-- - /form_wrap - -->
+
+    <div class="modal" ng-show="if_modal_show">
+      <article class="form_wrap">
+        <form  method="post" ng-submit="add_workout()">
+         <table>
+          <tr>
+            <td class="label">Exercise Name</td>
+            <td class="input">
+              <select ng-model='tmp.exercise_id' name="exercise_name">
+                <option ng-repeat="(key, value) in exercise_list" value="[!key!]">[!value!]</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="label">Exercise Color</td>
+            <td class="input">
+              <select ng-model='tmp.exercise_color' name="exercise_color">
+                <option ng-repeat="color in color_list" value="[!color!]">[!color!]</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="label">Notes</td>
+            <td class="input"><textarea rows="3" cols="30" name="notes" ng-model='tmp.notes' placeholder="e.g. 2*SUPERSET (Weight in heel)"></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Warm up set</td>
+            <td class="input"><textarea rows="3" cols="30" name="warmup_set" ng-model='tmp.warmup_set'></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Set 1</td>
+            <td class="input"><textarea rows="3" cols="30" name="set1" ng-model='tmp.set1' ></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Set 2</td>
+            <td class="input"><textarea rows="3" cols="30" name="set2" ng-model='tmp.set2' ></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Set 3</td>
+            <td class="input"><textarea rows="3" cols="30" name="set3" ng-model='tmp.set3' ></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Set 4</td>
+            <td class="input"><textarea rows="3" cols="30" name="set4" ng-model='tmp.set4' ></textarea></td>
+          </tr>
+          <tr>
+            <td class="label">Set 5</td>
+            <td class="input"><textarea rows="3" cols="30" name="set5" ng-model='tmp.set5' ></textarea></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td style="text-align:right">
+              <button type="button" ng-click="if_modal_show=flase;">Cancel</button>
+              <input type="submit" value="Add" />
+            </td>
+          </tr>
+        </table>
+        </form>
+      </article><!-- - /form_wrap - -->
+      <button type="button" ng-click="if_modal_show=flase;">Close</button>
+    </div><!--.modal-->
+
+    <div class="modal-backdrop" ng-show="if_modal_show"></div>
+
+  </div><!-- - .main_wrap - -->
+'''
+#----------------------------------------------#
 #             Code                             #
 #----------------------------------------------#
 import os
@@ -1366,16 +1653,73 @@ class submitQuestion(webapp2.RequestHandler):
   def post(self):
     client_name = self.request.get('client_name')
     client_email = self.request.get('client_email')
+    client_address = self.request.get('client_address')
     client_question = self.request.get('client_question')
+    submit_time = int(time.time())
 
     #--mail to host
-    message = mail.EmailMessage(sender="Web Question <ShannyCohen.Fitness@gmail.com>",
-                        subject="Question")    
+    message = mail.EmailMessage(sender="Web Question <ShannyCohen.Fitness@gmail.com>", subject="Question Recieved #" + str(submit_time))   
     message.to = "ShannyCohen.Fitness@gmail.com"
-    message.body = "Name: " + str(client_name) + "\n Email: " + str(client_email) + "\n Question: \n" + str(client_question)
+    message.reply_to = str(client_email)
+    message.body = "Name: " + str(client_name) + "\n\n Email: " + str(client_email) + "\n\n Address: " + str(client_address) + "\n\n Question: \n" + str(client_question)
     message.send()
 
     self.redirect('/contact_success')
+
+#----------------------------------------------#
+#      Workout Data Stucture                   #
+#----------------------------------------------#
+class Workout_db(ndb.Model):
+    add_time = ndb.StringProperty()
+    program_date = ndb.StringProperty()
+    muscles = ndb.StringProperty()
+    client_name = ndb.StringProperty()
+    client_email = ndb.StringProperty()
+    general_explanation = ndb.StringProperty()
+
+    workout = ndb.JsonProperty()
+
+    @classmethod
+    def _get_one_data(self,data_id):
+        item = Workout_db.get_by_id(data_id)
+        if item:
+          db_data = item.to_dict()
+        else: 
+          db_data = None
+        return json.dumps(db_data)
+
+    @classmethod
+    def _get_current_workout(self):
+        client_email = users.get_current_user().email()
+        item = Workout_db.get_by_id(client_email)
+        if item:
+          db_data = item.to_dict()
+        else: 
+          db_data = None
+        return json.dumps(db_data)
+
+class addWorkout_db(webapp2.RequestHandler):
+    def post(self):
+      if users.is_current_user_admin():
+        request_data = json.loads(self.request.body)
+        data_id = request_data.get('client_email')
+
+        if data_id and data_id != '':
+          item = Workout_db.get_by_id(data_id)
+           
+        if not item:
+          item = Workout_db(id=data_id)
+          item.add_time = datetime.datetime.now(pytz.timezone(Timezone)).strftime("%Y%m%d%H%M%S")
+        # - -
+        item.program_date = request_data.get('program_date')
+        item.muscles = request_data.get('muscles')
+        item.client_name = request_data.get('client_name')
+        item.client_email = request_data.get('client_email')
+        item.general_explanation = request_data.get('general_explanation')
+        item.workout = request_data.get('workout')
+        
+        item.put()
+        time.sleep(1)
 
 #----------------------------------------------#
 #      Client and Waitlist Data Stucture       #
@@ -1424,7 +1768,10 @@ class Client_db(ndb.Model):
     def _count_client(self):
         q1 = Client_db.query( ndb.AND(Client_db.client_program == 'Platinum',Client_db.program_status == 'Active') ).fetch(keys_only = True)
         q2 = Client_db.query( ndb.AND(Client_db.client_program == 'Gold',Client_db.program_status == 'Active') ).fetch(keys_only = True)
-        return json.dumps([len(q1), len(q2)])
+        q3 = Client_db.query( ndb.AND(Client_db.client_program == 'Silver',Client_db.program_status == 'Active') ).fetch(keys_only = True)
+        q4 = Client_db.query( ndb.AND(Client_db.client_program == 'Bronze',Client_db.program_status == 'Active') ).fetch(keys_only = True)
+        return json.dumps({'Platinum':len(q1),'Gold':len(q2), 'Silver':len(q3), 'Bronze':len(q4)})
+        # return json.dumps([len(q1), len(q2), len(q3), len(q4)])
 
     @classmethod
     def _get_current_client(self):
@@ -1565,7 +1912,7 @@ class chargeCard(webapp2.RequestHandler):
   def post(self):
 
     #- stripe key and plan
-    stripe.api_key = "xxxxxxxxxx"
+    stripe.api_key = "xxxxxxxx"
 
     # stripe.Plan.create(
     #   amount=55000,
@@ -1594,11 +1941,28 @@ class chargeCard(webapp2.RequestHandler):
     
     # - create stripe customer
     try:
-      customer = stripe.Customer.create(
-      source=token,
-      plan=item.client_program,
-      email=item.client_email
-      )
+      # coupon for silver and brozen customers
+      # if item.client_program == 'Silver' or item.client_program == 'Bronze':
+      #   client_count = json.loads(Client_db._count_client())
+      #   if client_count["Silver"] + client_count["Bronze"] < silver_brozen_coupon_limit:
+      #     customer = stripe.Customer.create(
+      #     source=token,
+      #     plan=item.client_program,
+      #     email=item.client_email,
+      #     coupon="50%OFF"
+      #     )
+      #   else:
+      #     customer = stripe.Customer.create(
+      #     source=token,
+      #     plan=item.client_program,
+      #     email=item.client_email
+      #     )
+      # else:
+        customer = stripe.Customer.create(
+        source=token,
+        plan=item.client_program,
+        email=item.client_email
+        )
     except stripe.error.CardError, e:
         self.response.out.write(str(e)) 
     except stripe.error.RateLimitError, e:
@@ -1618,10 +1982,10 @@ class chargeCard(webapp2.RequestHandler):
       item.put()
 
       #--mail to client
-      message = mail.EmailMessage(sender="Shanny Cohen Fitness <ShannyCohen.Fitness@gmail.com>",
-                          subject="Confirmation of Program Enrollment")    
+      message = mail.EmailMessage(sender="Shanny Cohen Fitness <ShannyCohen.Fitness@gmail.com>", subject="Confirmation of Program Enrollment")    
       message.to = item.client_email
-      message.body = "You have enrolled in the following program: " + "\n " + str(item.client_program) + '\n\n Shanny Cohen Fitness'
+      message.reply_to = "ShannyCohen.Fitness@gmail.com"
+      message.body = "Dear " + str(item.client_name) + ", \n\n You have enrolled in the following program: " + "\n " + str(item.client_program) + '\n\n Shanny Cohen Personal Training LLC.'
       message.send()
 
       self.redirect('/payment_success')
@@ -1630,7 +1994,7 @@ class cancelProgram(webapp2.RequestHandler):
   def get(self):
 
     #- stripe key 
-    stripe.api_key = "xxxxxxxxxx"
+    stripe.api_key = "xxxxxxxx"
 
     if users.get_current_user():
       client_email = users.get_current_user().email()
@@ -1658,7 +2022,7 @@ class cancelProgram(webapp2.RequestHandler):
 
 def cancelProgram_admin(client_email):
     #- stripe key 
-    stripe.api_key = "xxxxxxxxxx"
+    stripe.api_key = "xxxxxxxx"
 
     item = Client_db.get_by_id(client_email)
     if item.program_status == 'Active' and item.stripe_cus_id and item.stripe_subscription_id:
@@ -1795,6 +2159,14 @@ class Exercise_db(ndb.Model):
           db_data = {'data_id': data_id, 'exercise_name': item.exercise_name, 'equipment_type': item.equipment_type, 'muscle_targeted': item.muscle_targeted, 'exercise_video_key': item.exercise_video_key}
         return json.dumps(db_data)
 
+    @classmethod
+    def _get_all_names(self):
+        q =ndb.gql('SELECT data_id, exercise_name from Exercise_db')
+        db_data = {}
+        for item in q.iter():
+          db_data[item.data_id] = item.exercise_name
+        return json.dumps(db_data)
+
 class addExercise_db(webapp2.RequestHandler):
     def post(self):
 
@@ -1822,6 +2194,9 @@ class addExercise_db(webapp2.RequestHandler):
         time.sleep(1)
         self.redirect('/manage/exercise')
 
+#----------------------------------------------#
+#          List and Delete Data                #
+#----------------------------------------------#
 class deleteData(webapp2.RequestHandler):
     def get(self):
       if users.is_current_user_admin():
@@ -1849,6 +2224,12 @@ class deleteData(webapp2.RequestHandler):
 
         if data_set == "client":
           item = Client_db.get_by_id(data_id)
+          # delete workout plan for this client
+          workout_item = Workout_db.get_by_id(data_id)
+          if workout_item:
+            workout_item.key.delete()
+            time.sleep(1)
+
           stripe_remove_msg = 'success'
           if item.program_status == 'Active' and item.stripe_cus_id and item.stripe_subscription_id:
             stripe_remove_msg = cancelProgram_admin(data_id)
@@ -1871,6 +2252,14 @@ class deleteData(webapp2.RequestHandler):
           time.sleep(1)
           self.redirect('/list_data?testimonial')
 
+        if data_set == "workout":
+          item = Workout_db.get_by_id(data_id)
+          if item:
+            item.key.delete()
+            time.sleep(1)
+          self.response.headers['Content-Type'] = 'application/json'
+          self.response.out.write(json.dumps({})) 
+
 class listData(webapp2.RequestHandler):
     def get(self):
         page_address = self.request.uri
@@ -1884,6 +2273,10 @@ class listData(webapp2.RequestHandler):
         if data_set == 'exercise' and not data_id:
           self.response.headers['Content-Type'] = 'application/json'
           self.response.out.write(Exercise_db._get_all_data()) 
+
+        if data_set == 'exercise_names' and not data_id:
+          self.response.headers['Content-Type'] = 'application/json'
+          self.response.out.write(Exercise_db._get_all_names()) 
 
         if data_set == 'exercise' and data_id:
           self.response.headers['Content-Type'] = 'application/json'
@@ -1929,6 +2322,14 @@ class listData(webapp2.RequestHandler):
           self.response.headers['Content-Type'] = 'application/json'
           self.response.out.write(Testimonial_db._get_current_testimonial()) 
 
+        if data_set == 'workout' and data_id:
+          self.response.headers['Content-Type'] = 'application/json'
+          self.response.out.write(Workout_db._get_one_data(data_id)) 
+
+        if data_set == 'current_workout' and not data_id:
+          self.response.headers['Content-Type'] = 'application/json'
+          self.response.out.write(Workout_db._get_current_workout()) 
+
 #----------------------------------------------#
 #             Multi-Media Rendering            #
 #----------------------------------------------#
@@ -1955,9 +2356,9 @@ class RenderImg(webapp2.RequestHandler):
         if img_size == 'thumb':
             img.resize(width=100)
         if img_size == 'small':
-            img.resize(width=250)
+            img.resize(width=200)
         if img_size == 'medium':
-            img.resize(width=450)
+            img.resize(width=350)
         if img_size == 'large':
             img.resize(width=800)
         image = img.execute_transforms(output_encoding=images.JPEG)
@@ -2122,6 +2523,11 @@ class publicSite(webapp2.RequestHandler):
               page_name = 'My Testimonial'
               page_html = page_header + my_testimonial_page_html
 
+          if path_layer == 'my_workout':
+              page_id = 'my_workout'
+              page_name = 'My Workout'
+              page_html = page_header + my_workout_page_html
+
           if path_layer == 'publish_my_testimonial':
               page_id = 'publish_my_testimonial'
               page_name = 'Publish My Testimonial'
@@ -2167,6 +2573,13 @@ class publicSite(webapp2.RequestHandler):
                 nav_html = admin_nav_html
                 page_html = manage_testimonial_page_html
 
+              if base.startswith('workout'):
+                page_id = 'mange_workout'
+                page_name = 'Mange Workout'
+                nav_html = admin_nav_html
+                page_html = mange_workout_page_html
+                data_id = base.split('?')[1]
+
           if path_layer == 'edit':
               if base == 'edit' or base == '':
                 page_id = 'edit'
@@ -2200,6 +2613,13 @@ class publicSite(webapp2.RequestHandler):
                 page_name = 'Edit Testimonial'
                 nav_html = admin_nav_html
                 page_html = edit_testimonial_page_html
+                data_id = base.split('?')[1]
+
+              if base.startswith('workout'):
+                page_id = 'edit_workout'
+                page_name = 'Edit Workout'
+                nav_html = admin_nav_html
+                page_html = edit_workout_page_html
                 data_id = base.split('?')[1]
 
           if path_layer == 'publish':
@@ -2290,6 +2710,7 @@ app = webapp2.WSGIApplication([    # - Pages
     ('/my_program/?', publicSite),
     ('/my_info/?', publicSite),
     ('/my_testimonial/?', publicSite),
+    ('/my_workout/?', publicSite),
     ('/edit_my_info/?', publicSite),
     ('/add_my_info/?', addClient_db_user),
     ('/publish_my_testimonial/?', publicSite),
@@ -2309,12 +2730,14 @@ app = webapp2.WSGIApplication([    # - Pages
     ('/manage/client/?', publicSite),
     ('/manage/waitlist/?', publicSite),
     ('/manage/testimonial/?', publicSite),
+    ('/manage/workout/?', publicSite),
 
     ('/edit/?', publicSite),
     ('/edit/exercise/?', publicSite),
     ('/edit/client/?', publicSite),
     ('/edit/waitlist/?', publicSite),
     ('/edit/testimonial/?', publicSite),
+    ('/edit/workout/?', publicSite),
 
     ('/publish/exercise/?', publicSite),
     ('/publish/exercise_video?', publicSite),
@@ -2327,6 +2750,7 @@ app = webapp2.WSGIApplication([    # - Pages
     ('/manage/add_client/?', addClient_db),
     ('/manage/add_waitlist/?', addWaitlist_db),
     ('/manage/add_testimonial/?', addTestimonial_db),
+    ('/manage/add_workout/?', addWorkout_db),
 
     # ('/manage/add_client/?', addClient_db),
     ('/list_data/?', listData),

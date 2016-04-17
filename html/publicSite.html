@@ -51,7 +51,7 @@
 <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 <script type="text/javascript">
   {%if page_id == 'payment'%}
-    Stripe.setPublishableKey('xxxxxxxxxx');
+    Stripe.setPublishableKey('xxxxxxxx');
     jQuery(function($) {
       $('#payment-form').submit(function(event) {
         var $form = $(this);
@@ -247,6 +247,7 @@ demo.directive('testimonialView', function ($sce) {
 
 demo.controller('Ctrl', function($scope, $http, $sce) {
   $scope.huDisplay = 'on';
+  $scope.client_limit={'Platinum':6,'Gold':6}
   $scope.muscles = [
     { name: 'Abdominals', selected: false },
     { name: 'Adductors', selected: false },
@@ -265,6 +266,14 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     { name: 'Traps', selected: false },
     { name: 'Triceps', selected: false }
   ];
+  $scope.equipments = [
+    { name: 'Barbell', selected: true },
+    { name: 'Dumbbell', selected: true },
+    { name: 'Body Weight', selected: true },
+    { name: 'Kettlebells', selected: true },
+    { name: 'Machine', selected: true },
+    { name: 'Other', selected: true },
+  ];
   $scope.programs = [
     { name: 'Platinum', price: 550 },
     { name: 'Gold', price: 330 },
@@ -272,6 +281,7 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     { name: 'Bronze', price: 100 },
   ];
   $scope.program_status_list = ['Active', 'Canceled', 'Other'];
+  $scope.color_list = ['White', 'LightBlue', 'LightGreen', 'LightGrey', 'BlueGrey'];
 
 {% if page_id == 'programs' %}
   $scope.program_chosen='';
@@ -283,10 +293,10 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     .success(function(data, status) { 
       $scope.client_number = data; 
 
-      if($scope.client_number[0] < 5){$scope.platinum_avail=true;}
+      if($scope.client_number.Platinum < $scope.client_limit.Platinum){$scope.platinum_avail=true;}
       else {$scope.platinum_avail=false;}
 
-      if($scope.client_number[1] < 5){$scope.gold_avail=true;}
+      if($scope.client_number.Gold < $scope.client_limit.Gold){$scope.gold_avail=true;}
       else {$scope.gold_avail=false;}
   });
 
@@ -385,53 +395,133 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     $scope.exercise_data = data; 
   });
 
-  $scope.selection = [];
-  $scope.toggle_selection = function(muscle){
-    var idx = $scope.selection.indexOf(muscle);
-    // is currently selected
-    if (idx > -1) {
-      $scope.selection.splice(idx, 1);
+  $scope.muscle_selection = [];
+  $scope.muscle_full_selection = []; 
+  $scope.muscles.forEach(function(muscle) {
+    $scope.muscle_full_selection.push(muscle.name);
+  });
+
+  $scope.equipment_selection = []; 
+  $scope.equipment_full_selection = []; 
+  $scope.equipments.forEach(function(equipment) {
+    $scope.equipment_full_selection.push(equipment.name);
+  });
+  $scope.equipment_selection = $scope.equipment_full_selection.slice();
+
+  $scope.toggle_muscle_selection = function(muscle){
+    var idx = $scope.muscle_selection.indexOf(muscle);
+    if (idx > -1) { 
+      $scope.muscle_selection.splice(idx, 1); // is currently selected
     }
-    // is newly selected
     else {
-      $scope.selection.push(muscle);
+      $scope.muscle_selection.push(muscle);     // is newly selected
     }
-    $scope.display_data = $scope.filter_data();
+    var tmp_results = $scope.filter_equipment($scope.exercise_data);
+    $scope.display_data = $scope.filter_muscle(tmp_results);
   };
 
-  $scope.filter_data = function(){
+  $scope.toggle_equipment_selection = function(equipment){
+    var idx = $scope.equipment_selection.indexOf(equipment);
+    if (idx > -1) { 
+      $scope.equipment_selection.splice(idx, 1); // is currently selected
+    }
+    else {
+      $scope.equipment_selection.push(equipment);     // is newly selected
+    }
+    var tmp_results = $scope.filter_equipment($scope.exercise_data);
+    $scope.display_data = $scope.filter_muscle(tmp_results);
+  };
+
+  $scope.filter_equipment = function(input_array){
     var results = [];
-    for(var i = 0; i< $scope.exercise_data.length; i++){
-      for(var j = 0; j< $scope.selection.length; j++){
-        if($scope.exercise_data[i].muscle_targeted.indexOf($scope.selection[j]) > -1){
-          results.push($scope.exercise_data[i]);
+    var sel_other_equipment = false;
+    if($scope.equipment_selection.indexOf('Other') > -1){
+      sel_other_equipment = true;
+    }
+
+    input_array.forEach(function(item){
+      for(var j = 0; j< $scope.equipment_selection.length; j++){
+        if(item.equipment_type == $scope.equipment_selection[j]){
+          results.push(item);
+          break;
+        }
+      }
+      if(sel_other_equipment){ // include all other equipment types
+        var idx = $scope.equipment_full_selection.indexOf(item.equipment_type);
+        if(idx < 0){
+          results.push(item);
+        }
+      }
+    });
+    return results;
+  };
+
+  $scope.filter_muscle = function(input_array){
+    var results = [];
+
+    for(var i = 0; i< input_array.length; i++){
+      for(var j = 0; j< $scope.muscle_selection.length; j++){
+        if(input_array[i].muscle_targeted.indexOf($scope.muscle_selection[j]) > -1){
+          results.push(input_array[i]);
           break;
         }
       }
     }
     return results;
-  };
+  }
 
   $scope.display_exercises = function(){
     document.getElementById('exercise_wrap').style.display = "block";
     document.getElementById('initial_category_wrap').style.display = "none";
   };
 
-  $scope.select_all_exercises = function(muscle){
+  $scope.select_all_muscles = function(){
     for(var i = 0; i< $scope.muscles.length; i++){
       $scope.muscles[i].selected = true;
     }
-    $scope.display_data = $scope.exercise_data;
+    $scope.muscle_selection = $scope.muscle_full_selection.slice();
+    $scope.display_data = $scope.filter_equipment($scope.exercise_data);
   };
 
-  $scope.deselect_all_exercises = function(muscle){
+  $scope.deselect_all_muscles = function(){
     for(var i = 0; i< $scope.muscles.length; i++){
       $scope.muscles[i].selected = false;
     }
+    $scope.muscle_selection = [];
     $scope.display_data = [];
   };
+
+  $scope.select_all_equipments = function(){
+    for(var i = 0; i< $scope.equipments.length; i++){
+      $scope.equipments[i].selected = true;
+    }
+    $scope.equipment_selection = $scope.equipment_full_selection.slice();
+    $scope.display_data = $scope.filter_muscle($scope.exercise_data);
+  };
+
+  $scope.deselect_all_equipments = function(){
+    for(var i = 0; i< $scope.equipments.length; i++){
+      $scope.equipments[i].selected = false;
+    }
+    $scope.equipment_selection = [];
+    $scope.display_data = [];
+  };
+
+  $scope.select_all_exercises = function(){
+    for(var i = 0; i< $scope.muscles.length; i++){
+      $scope.muscles[i].selected = true;
+    }
+    for(var i = 0; i< $scope.equipments.length; i++){
+      $scope.equipments[i].selected = true;
+    }
+    $scope.muscle_selection = $scope.muscle_full_selection.slice();
+    $scope.equipment_selection = $scope.equipment_full_selection.slice();
+    $scope.display_data = $scope.exercise_data;
+  };
+
   $scope.sel_by_name = function(){
     $scope.select_all_exercises();
+    $scope.display_data = $scope.exercise_data;
   };
 {% endif %}
 
@@ -541,6 +631,49 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% endif %}
 {% endif %}
 
+{% if page_id == 'my_workout' %}
+  {% if user_name != 'No User' %} 
+    $scope.client_id = "{{data_id}}";
+    $scope.table_length = 0;
+
+    $http({ method: 'GET', url: '/list_data?current_workout'})
+    .success(function(data, status) { 
+      if(data){
+        $scope.item = data; 
+        $scope.item.workout = $scope.item.workout? $scope.item.workout: [];
+        $scope.table_length = $scope.get_table_length($scope.item.workout);
+      }
+    });
+
+    $scope.get_table_length = function(workout_array){
+      var max_length = 3;
+      for(var i = 0; i < workout_array.length; i++){
+        var item_length = 0;
+        if(workout_array[i].set5){
+           item_length = 5;
+        }
+        else if (workout_array[i].set4){
+          item_length = 4;
+        }
+        if(item_length > max_length) max_length = item_length;
+        if(max_length == 5) break;
+      };
+      return max_length||3;
+    };
+
+    $scope.del_workout = function(client_id){
+      if (confirm("Remove This Workout?") == true) {
+        $http({ method: 'GET', url: '/delete_data?workout?' + client_id})
+          .success(function(data, status) { 
+            $scope.item = data; 
+            $scope.item.workout = $scope.item.workout? $scope.item.workout: [];
+            $scope.table_length = $scope.get_table_length($scope.item.workout);
+        });
+      }
+    };
+  {% endif %}
+{% endif %}
+
 {% if page_id == 'manage_testimonial' %}
   {% if admin == 'true' %}
     $scope.testimonial_data = ''; 
@@ -638,6 +771,49 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% endif %}
 {% endif %}
 
+{% if page_id == 'mange_workout' %}
+  {% if admin == 'true' %}
+    $scope.client_id = "{{data_id}}";
+    $scope.table_length = 0;
+
+    $http({ method: 'GET', url: '/list_data?workout?' + $scope.client_id})
+    .success(function(data, status) { 
+      if(data){
+        $scope.item = data; 
+        $scope.item.workout = $scope.item.workout? $scope.item.workout: [];
+        $scope.table_length = $scope.get_table_length($scope.item.workout);
+      }
+    });
+
+    $scope.get_table_length = function(workout_array){
+      var max_length = 3;
+      for(var i = 0; i < workout_array.length; i++){
+        var item_length = 0;
+        if(workout_array[i].set5){
+           item_length = 5;
+        }
+        else if (workout_array[i].set4){
+          item_length = 4;
+        }
+        if(item_length > max_length) max_length = item_length;
+        if(max_length == 5) break;
+      };
+      return max_length||3;
+    };
+
+    $scope.del_workout = function(client_id){
+      if (confirm("Remove This Workout?") == true) {
+        $http({ method: 'GET', url: '/delete_data?workout?' + client_id})
+          .success(function(data, status) { 
+            $scope.item = data; 
+            $scope.item.workout = $scope.item.workout? $scope.item.workout: [];
+            $scope.table_length = $scope.get_table_length($scope.item.workout);
+        });
+      }
+    };
+  {% endif %}
+{% endif %}
+
 {% if page_id == 'edit_exercise' %}
   {% if admin == 'true' %}
     $scope.data_id = "{{data_id}}";
@@ -697,6 +873,69 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% endif %}
 {% endif %}
 
+{% if page_id == 'edit_workout' %}
+  {% if admin == 'true' %}
+    $scope.client_id = "{{data_id}}";
+    $scope.if_modal_show = false; 
+    $scope.item = {};
+    $scope.item.client_email = $scope.client_id; 
+    $scope.tmp = {'exercise_idx':-1, 'exercise_id':'','name':'', 'exercise_color':'', 'notes':'', 'warmup_set':'', 'set1':'','set2':'','set3':'','set4':'','set5':''};
+    $scope.exercise_list = '';    
+
+    $http({ method: 'GET', url: '/list_data?workout?' + $scope.client_id})
+    .success(function(data, status) { 
+      if(data){
+        $scope.item = data; 
+        // $scope.item.workout = $scope.item.workout? JSON.parse($scope.item.workout): [];
+        $scope.item.workout = $scope.item.workout? $scope.item.workout: [];
+      }
+    });
+
+    $http({ method: 'GET', url: '/list_data?exercise_names'})
+    .success(function(data, status) { 
+      $scope.exercise_list = data; 
+    });
+
+    $scope.new_workout = function(){
+      $scope.tmp = {'exercise_idx':-1, 'exercise_id':'','name':'', 'exercise_color':'', 'notes':'', 'warmup_set':'', 'set1':'','set2':'','set3':'','set4':'','set5':''};
+      var top = $(window).scrollTop() + 15;
+      $('.modal').css("top", top);
+      $scope.if_modal_show = true;
+    };
+
+    $scope.edit_workout = function(idx){
+      $scope.tmp = $scope.item.workout[idx];
+      $scope.tmp.exercise_idx = idx;
+      var top = $(window).scrollTop() + 15;
+      $('.modal').css("top", top);
+      $scope.if_modal_show = true;
+    };
+
+    $scope.add_workout = function(){
+      if(!$scope.item.workout) $scope.item.workout = [];
+
+      if($scope.tmp.exercise_idx < 0){
+        $scope.item.workout.push({'exercise_id':$scope.tmp.exercise_id,'name':$scope.exercise_list[$scope.tmp.exercise_id], 'exercise_color':$scope.tmp.exercise_color, 'notes':$scope.tmp.notes, 'warmup_set':$scope.tmp.warmup_set, 'set1':$scope.tmp.set1,'set2':$scope.tmp.set2,'set3':$scope.tmp.set3,'set4':$scope.tmp.set4,'set5':$scope.tmp.set5});
+      }
+      else { $scope.item.workout[$scope.tmp.exercise_idx] = $scope.tmp; }
+
+      $scope.if_modal_show = false;
+    };
+
+    $scope.del_workout = function(idx){
+      $scope.item.workout.splice(idx,1);
+    };
+
+    $scope.save_workout_plan = function(){
+      // angular pass post request to webapp2
+      $http.post('/manage/add_workout', $scope.item)
+      .success(function(data, status) {
+        window.location.replace('/manage/workout?' + $scope.client_id);
+      });
+    };
+  {% endif %}
+{% endif %}
+
 {% if page_id == 'publish_exercise_video' %}
   {% if admin == 'true' %}
     $scope.data_id = {{data_id}};    
@@ -714,6 +953,7 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
 <body>
   <div class="user_gate" ng-show="huDisplay=='on'">
     {% if user_name != 'No User' %} 
+      <a href="/my_workout"><button>My Workout Plan</button></a>
       <a href="/my_testimonial"><button>My Testimonials</button></a>
       <a href="/my_program"><button>My Program</button></a>
       <a href="/my_info"><button>My Info</button></a>

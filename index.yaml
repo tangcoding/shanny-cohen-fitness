@@ -51,3 +51,8 @@ indexes:
   - name: exercise_class
   - name: exercise_name
   - name: exercise_type
+
+- kind: Exercise_db
+  properties:
+  - name: data_id
+  - name: exercise_name
