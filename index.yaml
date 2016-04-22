@@ -56,3 +56,21 @@ indexes:
   properties:
   - name: data_id
   - name: exercise_name
+
+- kind: Template_db
+  properties:
+  - name: add_time
+  - name: author
+  - name: data_id
+  - name: template_name
+
+- kind: Template_db
+  properties:
+  - name: add_time
+  - name: author
+  - name: template_name
+
+- kind: Template_db
+  properties:
+  - name: data_id
+  - name: template_name
