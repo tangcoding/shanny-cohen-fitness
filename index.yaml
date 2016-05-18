@@ -14,6 +14,17 @@ indexes:
   properties:
   - name: add_time
   - name: data_id
+  - name: difficulty_level
+  - name: equipment_type
+  - name: exercise_name
+  - name: exercise_video_key
+  - name: muscle_targeted
+  - name: user_name
+
+- kind: Exercise_db
+  properties:
+  - name: add_time
+  - name: data_id
   - name: equipment_type
   - name: exercise_name
   - name: exercise_video_key
@@ -29,6 +40,15 @@ indexes:
   - name: exercise_type
   - name: exercise_video_key
   - name: user_name
+
+- kind: Exercise_db
+  properties:
+  - name: data_id
+  - name: difficulty_level
+  - name: equipment_type
+  - name: exercise_name
+  - name: exercise_video_key
+  - name: muscle_targeted
 
 - kind: Exercise_db
   properties:
@@ -74,3 +94,9 @@ indexes:
   properties:
   - name: data_id
   - name: template_name
+
+- kind: Workout_db
+  properties:
+  - name: add_time
+  - name: client_email
+  - name: data_id
