@@ -57,7 +57,7 @@
 
 <script type="text/javascript">
   {%if page_id == 'payment' or page_id == 'change_credit_card' %}
-    Stripe.setPublishableKey('xxxxxxxx');
+    Stripe.setPublishableKey('xxx');
     jQuery(function($) {
       $('#payment-form').submit(function(event) {
         var $form = $(this);
@@ -764,10 +764,38 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% if user_name != 'No User' %} 
     $scope.workout_data = [];
 
-    $http({ method: 'GET', url: '/list_data?current_workout'})
+    $http({ method: 'GET', url: '/list_data?current_client'})
     .success(function(data, status) { 
-      if(data){
-        $scope.workout_data = data; 
+      $scope.client_program = data.client_program;
+      $scope.program_status = data.program_status;
+
+      if($scope.program_status=="Active"){
+
+        if($scope.client_program=="Platinum"||$scope.client_program=="Gold"){
+          $http({ method: 'GET', url: '/list_data?current_workout'})
+          .success(function(data, status) { 
+            if(data){
+              $scope.workout_data = data; 
+            }
+          });
+        }
+        else if($scope.client_program=="Silver"){
+          $http({ method: 'GET', url: '/list_data?silver_workout'})
+          .success(function(data, status) { 
+            if(data){
+              $scope.workout_data = data; 
+            }
+          });
+        }
+        else if($scope.client_program=="Bronze"){
+          $http({ method: 'GET', url: '/list_data?bronze_workout'})
+          .success(function(data, status) { 
+            if(data){
+              $scope.workout_data = data; 
+            }
+          });
+        }
+
       }
     });
   {% endif %}
@@ -809,8 +837,8 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
       var divToPrint=document.getElementById("workout_plan");
       // var divToPrint = $('#workout_plan');
       newWin= window.open("");
-      newWin.document.write("<style> @media print{body {sans-serif; color: #777; size:landscape; margin: 5%;} #workout_plan{width: 1000px; table-layout: fixed; margin: auto auto; } #workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px; -webkit-print-color-adjust: exact;}#workout_plan td{padding: 5px; min-width: 100px;}.White, .Red, .Orange, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid #cccccc; padding: 10px 10px; margin: 5px auto; -webkit-print-color-adjust: exact;}.White{background:#fff;}.Red{background:#FFCDD2;}.Orange{background:#FFE0B2;}.LightBlue{background:#81D4FA;}.LightGreen{background:#B2DFDB;}.LightGrey{background:#E0E0E0;}.BlueGrey{background:#B0BEC5;} pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;}}</style>");
-      newWin.document.write("<style> body {sans-serif; color: #777; size:landscape; margin: 5%;} #workout_plan{width: 1000px; table-layout: fixed; margin: auto auto; } #workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px; -webkit-print-color-adjust: exact;}#workout_plan td{padding: 5px; min-width: 100px;}.White, .Red, .Orange, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid #cccccc; padding: 10px 10px; margin: 5px auto; -webkit-print-color-adjust: exact;}.White{background:#fff;}.Red{background:#FFCDD2;}.Orange{background:#FFE0B2;}.LightBlue{background:#81D4FA;}.LightGreen{background:#B2DFDB;}.LightGrey{background:#E0E0E0;}.BlueGrey{background:#B0BEC5;} pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;}</style>");
+      newWin.document.write("<style> @media print{body {sans-serif; color: #777; size:landscape; margin: 2%;text-align:center;} #workout_plan{width: 1000px; table-layout: fixed; margin: auto auto; } #workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px; -webkit-print-color-adjust: exact;}#workout_plan td{padding: 5px; min-width: 100px;}.White, .Red, .Orange, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid #cccccc; padding: 10px 10px; margin: 5px auto; -webkit-print-color-adjust: exact;}.White{background:#fff;}.Red{background:#FFCDD2;}.Orange{background:#FFE0B2;}.LightBlue{background:#81D4FA;}.LightGreen{background:#B2DFDB;}.LightGrey{background:#E0E0E0;}.BlueGrey{background:#B0BEC5;} pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;}}</style>");
+      newWin.document.write("<style> body {sans-serif; color: #777; size:landscape; margin: 2%;text-align:center;} #workout_plan{width: 1000px; table-layout: fixed; margin: auto auto; } #workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px; -webkit-print-color-adjust: exact;}#workout_plan td{padding: 5px; min-width: 100px;}.White, .Red, .Orange, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid #cccccc; padding: 10px 10px; margin: 5px auto; -webkit-print-color-adjust: exact;}.White{background:#fff;}.Red{background:#FFCDD2;}.Orange{background:#FFE0B2;}.LightBlue{background:#81D4FA;}.LightGreen{background:#B2DFDB;}.LightGrey{background:#E0E0E0;}.BlueGrey{background:#B0BEC5;} pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;}</style>");
 
       if($scope.table_length <4){
         newWin.document.write("<style>@media print{.set4{display:none;}.set5{display:none;}}</style>");
@@ -1118,24 +1146,24 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% endif %}
 {% endif %}
 
-{% if page_id == 'manage_workout' %}
+{% if page_id == 'manage_pg_workout'%}
   {% if admin == 'true' %}
     $scope.workout_data = ''; 
     $scope.client_emails = [];
 
-    $http({ method: 'GET', url: '/list_data?client_emails'})
+    $http({ method: 'GET', url: '/list_data?pg_client_emails'})
     .success(function(data, status) { 
       $scope.client_emails = data;
     });
 
-    $http({ method: 'GET', url: '/list_data?workout' })
+    $http({ method: 'GET', url: '/list_data?pg_workout' })
     .success(function(data, status) { 
       $scope.workout_data = data; 
     });
 
     $scope.delete = function(data_id) {
       if (confirm("Remove This Workout Plan??") == true) {
-        $http({ method: 'GET', url: '/delete_data?workout?' + data_id})
+        $http({ method: 'GET', url: '/delete_data?pg_workout?' + data_id})
           .success(function(data, status) { 
             $scope.workout_data = data; 
         });
@@ -1144,9 +1172,32 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% endif %}
 {% endif %}
 
-{% if page_id == 'manage_view_workout' %}
+{% if page_id == 'manage_sb_workout'%}
+  {% if admin == 'true' %}
+    $scope.workout_data = ''; 
+    $scope.client_emails = [];
+
+    $http({ method: 'GET', url: '/list_data?sb_workout' })
+    .success(function(data, status) { 
+      $scope.workout_data = data; 
+    });
+
+    $scope.delete = function(data_id) {
+      if (confirm("Remove This Workout Plan??") == true) {
+        $http({ method: 'GET', url: '/delete_data?sb_workout?' + data_id})
+          .success(function(data, status) { 
+            $scope.workout_data = data; 
+        });
+      }
+    };
+  {% endif %}
+{% endif %}
+
+{% if page_id == 'manage_view_pg_workout' or page_id == 'manage_view_sb_workout' %}
   {% if admin == 'true' %}
     $scope.data_id = "{{data_id}}";
+    $scope.item={};
+    $scope.item.data_id = "{{data_id}}";
     $scope.table_length = 0;
 
     $http({ method: 'GET', url: '/list_data?workout?' + $scope.data_id})
@@ -1178,7 +1229,7 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
       if (confirm("Remove This Workout Plan?") == true) {
         $http({ method: 'GET', url: '/delete_data?workout?' + data_id})
           .success(function(data, status) { 
-            window.location.replace('/manage/workout'); 
+            window.location.replace('/manage/pg_workout'); 
         });
       }
     };
@@ -1189,8 +1240,8 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
       var divToPrint=document.getElementById("workout_plan");
       // var divToPrint = $('#workout_plan');
       newWin= window.open("");
-      newWin.document.write("<style> @media print{body {sans-serif; color: #777; size:landscape; margin: 5%;} #workout_plan{width: 1000px; table-layout: fixed; margin: auto auto; } #workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px; -webkit-print-color-adjust: exact;}#workout_plan td{padding: 5px; min-width: 100px;}.White, .Red, .Orange, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid #cccccc; padding: 10px 10px; margin: 5px auto; -webkit-print-color-adjust: exact;}.White{background:#fff;}.Red{background:#FFCDD2;}.Orange{background:#FFE0B2;}.LightBlue{background:#81D4FA;}.LightGreen{background:#B2DFDB;}.LightGrey{background:#E0E0E0;}.BlueGrey{background:#B0BEC5;} pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;}}</style>");
-      newWin.document.write("<style> body {sans-serif; color: #777; size:landscape; margin: 5%;} #workout_plan{width: 1000px; table-layout: fixed; margin: auto auto; } #workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px; -webkit-print-color-adjust: exact;}#workout_plan td{padding: 5px; min-width: 100px;}.White, .Red, .Orange, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid #cccccc; padding: 10px 10px; margin: 5px auto; -webkit-print-color-adjust: exact;}.White{background:#fff;}.Red{background:#FFCDD2;}.Orange{background:#FFE0B2;}.LightBlue{background:#81D4FA;}.LightGreen{background:#B2DFDB;}.LightGrey{background:#E0E0E0;}.BlueGrey{background:#B0BEC5;} pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;}</style>");
+      newWin.document.write("<style> @media print{body {sans-serif; color: #777; size:landscape; margin: 2%; text-align:center;} #workout_plan{width: 1000px; table-layout: fixed; margin: auto auto; } #workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px; -webkit-print-color-adjust: exact;}#workout_plan td{padding: 5px; min-width: 100px;}.White, .Red, .Orange, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid #cccccc; padding: 10px 10px; margin: 5px auto; -webkit-print-color-adjust: exact;}.White{background:#fff;}.Red{background:#FFCDD2;}.Orange{background:#FFE0B2;}.LightBlue{background:#81D4FA;}.LightGreen{background:#B2DFDB;}.LightGrey{background:#E0E0E0;}.BlueGrey{background:#B0BEC5;} pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;}}</style>");
+      newWin.document.write("<style> body {sans-serif; color: #777; size:landscape; margin: 2%; text-align:center;} #workout_plan{width: 1000px; table-layout: fixed; margin: auto auto; } #workout_plan th{background:#37474F; color: #fff; padding: 5px; min-width: 100px; -webkit-print-color-adjust: exact;}#workout_plan td{padding: 5px; min-width: 100px;}.White, .Red, .Orange, .LightBlue, .LightGreen, .LightGrey, .BlueGrey {border:1px solid #cccccc; padding: 10px 10px; margin: 5px auto; -webkit-print-color-adjust: exact;}.White{background:#fff;}.Red{background:#FFCDD2;}.Orange{background:#FFE0B2;}.LightBlue{background:#81D4FA;}.LightGreen{background:#B2DFDB;}.LightGrey{background:#E0E0E0;}.BlueGrey{background:#B0BEC5;} pre{ white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;}</style>");
 
       if($scope.table_length <4){
         newWin.document.write("<style>@media print{.set4{display:none;}.set5{display:none;}}</style>");
@@ -1364,9 +1415,10 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% endif %}
 {% endif %}
 
-{% if page_id == 'edit_workout' or page_id == 'publish_workout' %}
+{% if page_id == 'publish_pg_workout' or page_id == 'publish_sb_workout' or page_id == 'edit_pg_workout' or page_id == 'edit_sb_workout' %}
   {% if admin == 'true' %}
     $scope.if_modal_show = false; 
+    $scope.if_insert = false;
     $scope.template_id = '';
     $scope.item = {};
     $scope.tmp = {'exercise_idx':-1, 'exercise_id':'','name':'', 'exercise_color':'', 'notes':'', 'warmup_set':'', 'set1':'','set2':'','set3':'','set4':'','set5':''};
@@ -1375,13 +1427,16 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     $scope.template_array = [];  
     $scope.client_emails = []; 
 
-    $http({ method: 'GET', url: '/list_data?client_emails'})
-    .success(function(data, status) { 
-      $scope.client_emails = data;
-    });
+    {% if page_id == 'publish_pg_workout' or page_id == 'edit_pg_workout'%}
+      $http({ method: 'GET', url: '/list_data?pg_client_emails'})
+      .success(function(data, status) { 
+        $scope.client_emails = data;
+      });
+    {%endif%}
 
-    {% if page_id == 'edit_workout' %}
-      $scope.data_id = {{data_id}};
+    {% if page_id == 'edit_pg_workout' or page_id == 'edit_sb_workout'%}
+      $scope.data_id = "{{data_id}}";
+      $scope.item.data_id = "{{data_id}}";
       $http({ method: 'GET', url: '/list_data?workout?' + $scope.data_id})
       .success(function(data, status) { 
         if(data){
@@ -1426,12 +1481,20 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     $scope.add_workout = function(){
       if(!$scope.item.workout) $scope.item.workout = [];
 
+      if($scope.if_insert&&$scope.tmp.exercise_idx >= 0){
+        $scope.tmp.name = $scope.exercise_list[$scope.tmp.exercise_id];
+        $scope.item.workout.splice($scope.tmp.exercise_idx,0, $scope.tmp); 
+        $scope.if_modal_show = false; 
+        $scope.if_insert = false;
+        return;
+      }
+
       if($scope.tmp.exercise_idx < 0){
         $scope.item.workout.push({'exercise_id':$scope.tmp.exercise_id,'name':$scope.exercise_list[$scope.tmp.exercise_id], 'exercise_color':$scope.tmp.exercise_color, 'notes':$scope.tmp.notes, 'warmup_set':$scope.tmp.warmup_set, 'set1':$scope.tmp.set1,'set2':$scope.tmp.set2,'set3':$scope.tmp.set3,'set4':$scope.tmp.set4,'set5':$scope.tmp.set5});
       }
       else { 
-        $scope.tmp.name = $scope.exercise_list[$scope.tmp.exercise_id];
-        $scope.item.workout[$scope.tmp.exercise_idx] = $scope.tmp; 
+          $scope.tmp.name = $scope.exercise_list[$scope.tmp.exercise_id];
+          $scope.item.workout[$scope.tmp.exercise_idx] = $scope.tmp;  
       }
 
       $scope.if_modal_show = false;
@@ -1445,7 +1508,12 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
       // angular pass post request to webapp2
       $http.post('/manage/add_workout', $scope.item)
       .success(function(data, status) {
-        window.location.replace('/manage/workout');
+        {% if page_id == 'publish_pg_workout' or page_id == 'edit_pg_workout'%}
+          window.location.replace('/manage/pg_workout');
+        {%endif%}
+        {% if page_id == 'publish_sb_workout' or page_id == 'edit_sb_workout'%}
+          window.location.replace('/manage/sb_workout');
+        {%endif%}
       });
     };
 
@@ -1454,12 +1522,20 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
         $http({ method: 'GET', url: '/list_data?template?' + $scope.template_id})
         .success(function(data, status) { 
           if(data){
+            var tmp_program_date = $scope.item.program_date;
+            var tmp_client_email = $scope.item.client_email;
+            var tmp_data_id = $scope.item.data_id;
             $scope.item = data; 
             $scope.item.workout = $scope.item.workout? $scope.item.workout: [];
+            $scope.item.template_name = data.template_name;
+            $scope.item.program_date = tmp_program_date;
+            $scope.item.client_email = tmp_client_email;
+            $scope.item.data_id = tmp_data_id;
           }
         }); 
       }
     };
+
   {% endif %}
 {% endif %}
 
@@ -1467,6 +1543,7 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
   {% if admin == 'true' %}
     $scope.data_id = "{{data_id}}";
     $scope.if_modal_show = false; 
+    $scope.if_insert = false;
     $scope.item = {};
     $scope.tmp = {'exercise_idx':-1, 'exercise_id':'','name':'', 'exercise_color':'', 'notes':'', 'warmup_set':'', 'set1':'','set2':'','set3':'','set4':'','set5':''};
     $scope.exercise_list = ''; 
@@ -1499,22 +1576,30 @@ demo.controller('Ctrl', function($scope, $http, $sce) {
     };
 
     $scope.edit_workout = function(idx){
-      $scope.tmp = $scope.item.workout[idx];
-      $scope.tmp.exercise_idx = idx;
       var top = $(window).scrollTop() + 15;
       $('.modal').css("top", top);
       $scope.if_modal_show = true;
+      $scope.tmp = $scope.item.workout[idx];
+      $scope.tmp.exercise_idx = idx;
     };
 
     $scope.add_workout = function(){
       if(!$scope.item.workout) $scope.item.workout = [];
 
+      if($scope.if_insert&&$scope.tmp.exercise_idx >= 0){
+        $scope.tmp.name = $scope.exercise_list[$scope.tmp.exercise_id];
+        $scope.item.workout.splice($scope.tmp.exercise_idx,0, $scope.tmp); 
+        $scope.if_modal_show = false; 
+        $scope.if_insert = false;
+        return;
+      }
+
       if($scope.tmp.exercise_idx < 0){
         $scope.item.workout.push({'exercise_id':$scope.tmp.exercise_id,'name':$scope.exercise_list[$scope.tmp.exercise_id], 'exercise_color':$scope.tmp.exercise_color, 'notes':$scope.tmp.notes, 'warmup_set':$scope.tmp.warmup_set, 'set1':$scope.tmp.set1,'set2':$scope.tmp.set2,'set3':$scope.tmp.set3,'set4':$scope.tmp.set4,'set5':$scope.tmp.set5});
       }
       else { 
-        $scope.tmp.name = $scope.exercise_list[$scope.tmp.exercise_id];
-        $scope.item.workout[$scope.tmp.exercise_idx] = $scope.tmp; 
+          $scope.tmp.name = $scope.exercise_list[$scope.tmp.exercise_id];
+          $scope.item.workout[$scope.tmp.exercise_idx] = $scope.tmp;  
       }
 
       $scope.if_modal_show = false;
